@@ -37,4 +37,6 @@ dependencies {
     
     api "androidx.camera:camera-core:${camerax_version}"
     api "androidx.camera:camera-camera2:${camerax_version}"
+
+    api 'com.google.firebase:firebase-ml-vision:20.0.0'
 }
