@@ -1,16 +1,22 @@
 package com.github.bobekos.simplebarcodescanner2.camera.v2
 
 import android.graphics.Matrix
+import android.os.Handler
+import android.util.Log
 import android.util.Rational
 import android.util.Size
 import android.view.TextureView
-import androidx.camera.core.*
+import androidx.camera.core.CameraX
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.Preview
+import androidx.camera.core.PreviewConfig
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraBuilder
 import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
 import com.github.bobekos.simplebarcodescanner2.utils.fdiv
+import com.google.firebase.ml.vision.FirebaseVision
 
-class Camera2SourceBuilder(private val config: ScannerConfig) : CameraBuilder<Preview>() {
+class Camera2SourceBuilder(private val config: ScannerConfig) : CameraBuilder<Preview, ImageAnalysis>() {
 
     private val previewConfig = PreviewConfig.Builder()
         .setLensFacing(getFacing(config.lensFacing))
@@ -30,20 +36,24 @@ class Camera2SourceBuilder(private val config: ScannerConfig) : CameraBuilder<Pr
         return preview
     }
 
-    override fun createImageAnalyzer() {
-        //TODO set default handler
+    override fun createImageAnalyzer(handler: Handler): ImageAnalysis {
+        val visionBarcodeDetector = FirebaseVision.getInstance().visionBarcodeDetector
 
-        val imageAnalysisConfig = ImageAnalysisConfig.Builder()
-            .setTargetResolution(Size(480, 360))
-            .setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
-            .setLensFacing(getFacing(config.lensFacing))
-            .build()
+        val imageProcessor = Camera2ImageProcessor(handler, getFacing(config.lensFacing))
+        imageProcessor.setImageProcessListener {
+            visionBarcodeDetector.detectInImage(it)
+                .addOnSuccessListener { result ->
+                    result?.let {
+                        Log.e("OnComplete", "Size: ${it.size}")
+                    }
 
-        val imageAnalysis = ImageAnalysis(imageAnalysisConfig)
-
-        imageAnalysis.setAnalyzer { image, rotationDegrees ->
-            //TODO callback to firebase
+                }
+                .addOnFailureListener {
+                    Log.e("OnFailure", "", it)
+                }
         }
+
+        return imageProcessor.imageAnalysis
     }
 
     private fun getFacing(facing: CameraFacing): CameraX.LensFacing {

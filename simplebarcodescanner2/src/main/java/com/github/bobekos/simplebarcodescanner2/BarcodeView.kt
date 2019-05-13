@@ -66,7 +66,9 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                     lifecycleRegistry.markState(Lifecycle.State.STARTED)
 
                     if (this@apply.isAvailable) {
-                        cameraSource.onSurfaceReady(this@apply, width, height)
+                        cameraSource.onSurfaceReady(this@apply, width, height) { preview, imageProcessor ->
+                            CameraX.bindToLifecycle(this@BarcodeView, preview, imageProcessor)
+                        }
                     }
                 }
             }
