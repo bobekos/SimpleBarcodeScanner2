@@ -4,15 +4,13 @@ import android.graphics.Matrix
 import android.util.Rational
 import android.util.Size
 import android.view.TextureView
-import androidx.camera.core.CameraX
-import androidx.camera.core.Preview
-import androidx.camera.core.PreviewConfig
+import androidx.camera.core.*
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
-import com.github.bobekos.simplebarcodescanner2.camera.base.PreviewBuilder
+import com.github.bobekos.simplebarcodescanner2.camera.base.CameraBuilder
 import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
 import com.github.bobekos.simplebarcodescanner2.utils.fdiv
 
-class Camera2PreviewBuilder(private val config: ScannerConfig) : PreviewBuilder<Preview>() {
+class Camera2SourceBuilder(private val config: ScannerConfig) : CameraBuilder<Preview>() {
 
     private val previewConfig = PreviewConfig.Builder()
         .setLensFacing(getFacing(config.lensFacing))
@@ -20,9 +18,7 @@ class Camera2PreviewBuilder(private val config: ScannerConfig) : PreviewBuilder<
         .setTargetAspectRatio(Rational(config.previewSize.width, config.previewSize.height))
         .build()
 
-    override fun createPreview(textureView: TextureView, width: Int, height: Int, block: (result: Preview) -> Unit) {
-        super.createPreview(textureView, width, height, block)
-
+    override fun createPreview(textureView: TextureView, width: Int, height: Int): Preview {
         val preview = Preview(previewConfig)
 
         preview.setOnPreviewOutputUpdateListener {
@@ -31,7 +27,23 @@ class Camera2PreviewBuilder(private val config: ScannerConfig) : PreviewBuilder<
             updateTextureView(textureView, it.textureSize, width, height)
         }
 
-        block(preview)
+        return preview
+    }
+
+    override fun createImageAnalyzer() {
+        //TODO set default handler
+
+        val imageAnalysisConfig = ImageAnalysisConfig.Builder()
+            .setTargetResolution(Size(480, 360))
+            .setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
+            .setLensFacing(getFacing(config.lensFacing))
+            .build()
+
+        val imageAnalysis = ImageAnalysis(imageAnalysisConfig)
+
+        imageAnalysis.setAnalyzer { image, rotationDegrees ->
+            //TODO callback to firebase
+        }
     }
 
     private fun getFacing(facing: CameraFacing): CameraX.LensFacing {

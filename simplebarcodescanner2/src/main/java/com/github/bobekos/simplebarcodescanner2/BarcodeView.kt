@@ -11,7 +11,8 @@ import androidx.camera.core.CameraX
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
-import com.github.bobekos.simplebarcodescanner2.camera.v2.Camera2PreviewBuilder
+import com.github.bobekos.simplebarcodescanner2.camera.v2.Camera2SourceBuilder
+import com.github.bobekos.simplebarcodescanner2.camera.v2.Camera2Source
 
 class BarcodeView : FrameLayout, LifecycleOwner {
 
@@ -33,8 +34,8 @@ class BarcodeView : FrameLayout, LifecycleOwner {
         ScannerConfig(Size(context.resources.displayMetrics.widthPixels, context.resources.displayMetrics.heightPixels))
     }
 
-    private val previewBuilder by lazy {
-        Camera2PreviewBuilder(defaultConfig)
+    private val cameraSource by lazy {
+        Camera2Source(defaultConfig)
     }
 
     override fun getLifecycle(): Lifecycle = lifecycleRegistry
@@ -65,9 +66,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                     lifecycleRegistry.markState(Lifecycle.State.STARTED)
 
                     if (this@apply.isAvailable) {
-                        previewBuilder.createPreview(this@apply, right - left, bottom - top) {
-                            CameraX.bindToLifecycle(this@BarcodeView, it)
-                        }
+                        cameraSource.onSurfaceReady(this@apply, width, height)
                     }
                 }
             }
