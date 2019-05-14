@@ -11,12 +11,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import com.github.bobekos.simplebarcodescanner2.camera.v2.Camera2Source
-import com.github.bobekos.simplebarcodescanner2.model.BarcodeSurface
 import com.github.bobekos.simplebarcodescanner2.scanner.BarcodeScanner
 import com.github.bobekos.simplebarcodescanner2.utils.isNotDisposed
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.Scheduler
+import io.reactivex.schedulers.Schedulers
 
 class BarcodeView : FrameLayout, LifecycleOwner {
 
@@ -58,14 +58,8 @@ class BarcodeView : FrameLayout, LifecycleOwner {
         addView(textureView)
     }
 
-    private fun getObservable(): Observable<FirebaseVisionBarcode> {
-        return getSurfaceObservable()
-            .concatMap { cameraSource.getObservable(this, it) }
-            .concatMap { barcodeScanner.getObservable(it) }
-    }
-
-    private fun getSurfaceObservable(): Observable<BarcodeSurface> {
-        return Observable.create<BarcodeSurface> { emitter ->
+    fun getObservable(): Observable<FirebaseVisionBarcode> {
+        return Observable.create<FirebaseVisionBarcode> { emitter ->
             textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
                 override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
                     //TODO
@@ -75,16 +69,25 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                 }
 
                 override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
+                    lifecycleRegistry.markState(Lifecycle.State.DESTROYED)
+
                     emitter.isNotDisposed {
-                        onNext(BarcodeSurface.Disposed)
+                        //onNext(BarcodeSurface.Disposed)
                     }
 
                     return true
                 }
 
                 override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
-                    emitter.isNotDisposed {
-                        onNext(BarcodeSurface.MetaData(textureView, width, height))
+                    lifecycleRegistry.markState(Lifecycle.State.CREATED)
+                    lifecycleRegistry.markState(Lifecycle.State.STARTED)
+
+                    cameraSource.create(this@BarcodeView, textureView, width, height) { image ->
+                        barcodeScanner.create(image) { barcode ->
+                            emitter.isNotDisposed {
+                                onNext(barcode)
+                            }
+                        }
                     }
                 }
             }
@@ -92,6 +95,6 @@ class BarcodeView : FrameLayout, LifecycleOwner {
             emitter.setCancellable {
                 textureView.surfaceTextureListener = null
             }
-        }.subscribeOn(AndroidSchedulers.mainThread())
+        }
     }
 }

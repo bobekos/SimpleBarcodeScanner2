@@ -7,12 +7,28 @@ import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.atomic.AtomicBoolean
 
 class BarcodeScanner(private val config: ScannerConfig) {
 
+    companion object {
+        val isProcessing = AtomicBoolean(false)
+    }
     //TODO CONFIG
 
     private val detector = FirebaseVision.getInstance().visionBarcodeDetector
+
+    fun create(image: FirebaseVisionImage, block: (barcode: FirebaseVisionBarcode) -> Unit) {
+        detector.detectInImage(image)
+            .addOnSuccessListener { result ->
+                result?.forEach(block)
+
+                isProcessing.set(false)
+            }
+            .addOnFailureListener {
+                //TODO
+            }
+    }
 
     fun getObservable(image: FirebaseVisionImage): Observable<FirebaseVisionBarcode> {
         return Observable.create<FirebaseVisionBarcode> { emitter ->

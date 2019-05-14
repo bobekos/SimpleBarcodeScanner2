@@ -3,7 +3,6 @@ package com.github.bobekos.simplebarcodescanner2.camera.base
 import android.os.Handler
 import android.os.HandlerThread
 import android.view.TextureView
-import com.github.bobekos.simplebarcodescanner2.model.BarcodeSurface
 import com.github.bobekos.simplebarcodescanner2.utils.DisplayRotation
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 
@@ -18,10 +17,10 @@ abstract class CameraBuilder<T, X> {
 
     abstract fun createImageAnalyzer(handler: Handler, block: (image: FirebaseVisionImage) -> Unit): X
 
-    fun getPreview(surfaceMetaData: BarcodeSurface.MetaData): T {
-        displayRotation = DisplayRotation(surfaceMetaData.textureView.display)
+    fun getPreview(textureView: TextureView, width: Int, height: Int): T {
+        displayRotation = DisplayRotation(textureView.display)
 
-        return createPreview(surfaceMetaData.textureView, surfaceMetaData.width, surfaceMetaData.height)
+        return createPreview(textureView, width, height)
     }
 
     fun getImageProcessor(block: (image: FirebaseVisionImage) -> Unit): X {

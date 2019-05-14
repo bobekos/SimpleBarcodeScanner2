@@ -9,8 +9,8 @@ open class CameraImageProcessBuilder {
         private set
 
     companion object {
-        const val IMAGE_PROCESS_RESOLUTION_WIDTH = 480
-        const val IMAGE_PROCESS_RESOLUTION_HEIGHT = 360
+        const val IMAGE_PROCESS_RESOLUTION_WIDTH = 640
+        const val IMAGE_PROCESS_RESOLUTION_HEIGHT = 480
     }
 
     fun setImageProcessListener(block: (image: FirebaseVisionImage) -> Unit) {
