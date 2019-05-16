@@ -5,6 +5,10 @@ import android.view.Surface
 
 class DisplayRotation(private val display: Display?) {
 
+    fun test(): Int {
+        return display?.rotation ?: Surface.ROTATION_0
+    }
+
     fun getSurfaceRotation(): Float {
         return when (display?.rotation) {
             Surface.ROTATION_0 -> 0f

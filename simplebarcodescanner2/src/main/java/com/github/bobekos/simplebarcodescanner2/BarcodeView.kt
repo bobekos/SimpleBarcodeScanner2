@@ -44,7 +44,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     override fun getLifecycle(): Lifecycle = lifecycleRegistry
 
     private fun init() {
-        setBackgroundColor(Color.BLACK)
+        setBackgroundColor(Color.RED)
 
         lifecycleRegistry = LifecycleRegistry(this)
 
