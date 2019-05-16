@@ -1,14 +1,14 @@
 package com.github.bobekos.simplebarcodescanner2.camera.v2
 
+import android.media.Image
 import android.os.Handler
 import android.util.Size
 import androidx.camera.core.CameraX
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysisConfig
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraImageProcessBuilder
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
 
-class Camera2ImageProcessor(handler: Handler, facing: CameraX.LensFacing) : CameraImageProcessBuilder() {
+class Camera2ImageProcessor(handler: Handler, facing: CameraX.LensFacing) : CameraImageProcessBuilder<Image>() {
 
     private val config = ImageAnalysisConfig.Builder()
         .setTargetResolution(Size(IMAGE_PROCESS_RESOLUTION_WIDTH, IMAGE_PROCESS_RESOLUTION_HEIGHT))
@@ -22,9 +22,8 @@ class Camera2ImageProcessor(handler: Handler, facing: CameraX.LensFacing) : Came
     init {
         imageAnalysis.setAnalyzer { image, rotationDegrees ->
             image?.image?.let {
-                imageProcessCallback(FirebaseVisionImage.fromMediaImage(it, getVisionRotation(rotationDegrees)))
+                imageProcessCallback?.invoke(it, getVisionRotation(rotationDegrees))
             }
-
         }
     }
 

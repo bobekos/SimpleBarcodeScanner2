@@ -7,12 +7,14 @@ import android.util.AttributeSet
 import android.util.Size
 import android.view.TextureView
 import android.widget.FrameLayout
-import androidx.camera.core.CameraX
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
-import com.github.bobekos.simplebarcodescanner2.camera.v2.Camera2SourceBuilder
 import com.github.bobekos.simplebarcodescanner2.camera.v2.Camera2Source
+import com.github.bobekos.simplebarcodescanner2.scanner.BarcodeScanner
+import com.github.bobekos.simplebarcodescanner2.utils.isNotDisposed
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import io.reactivex.Observable
 
 class BarcodeView : FrameLayout, LifecycleOwner {
 
@@ -29,6 +31,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     }
 
     private lateinit var lifecycleRegistry: LifecycleRegistry
+    private lateinit var textureView: TextureView
 
     private val defaultConfig by lazy {
         ScannerConfig(Size(context.resources.displayMetrics.widthPixels, context.resources.displayMetrics.heightPixels))
@@ -38,25 +41,37 @@ class BarcodeView : FrameLayout, LifecycleOwner {
         Camera2Source(defaultConfig)
     }
 
+    private val barcodeScanner by lazy {
+        BarcodeScanner(defaultConfig)
+    }
+
     override fun getLifecycle(): Lifecycle = lifecycleRegistry
 
     private fun init() {
         setBackgroundColor(Color.BLACK)
 
         lifecycleRegistry = LifecycleRegistry(this)
+        textureView = TextureView(context)
 
-        val textureView = TextureView(context).apply {
-            surfaceTextureListener = object : TextureView.SurfaceTextureListener {
+        addView(textureView)
+    }
+
+    fun getObservable(): Observable<FirebaseVisionBarcode> {
+        return Observable.create<FirebaseVisionBarcode> { emitter ->
+            textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
                 override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
-                    val test = ""
+                    //TODO
                 }
 
                 override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
-                    val test = ""
                 }
 
                 override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
                     lifecycleRegistry.markState(Lifecycle.State.DESTROYED)
+
+                    emitter.isNotDisposed {
+                        //onNext(BarcodeSurface.Disposed)
+                    }
 
                     return true
                 }
@@ -65,15 +80,21 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                     lifecycleRegistry.markState(Lifecycle.State.CREATED)
                     lifecycleRegistry.markState(Lifecycle.State.STARTED)
 
-                    if (this@apply.isAvailable) {
-                        cameraSource.onSurfaceReady(this@apply, width, height) { preview, imageProcessor ->
-                            CameraX.bindToLifecycle(this@BarcodeView, preview, imageProcessor)
+                    cameraSource
+                        .build(this@BarcodeView, textureView, width, height)
+                        .onImageProcessing { image, firebaseRotation ->
+                            barcodeScanner.processImage(image, firebaseRotation) { barcode ->
+                                emitter.isNotDisposed {
+                                    onNext(barcode)
+                                }
+                            }
                         }
-                    }
                 }
             }
-        }
 
-        addView(textureView)
+            emitter.setCancellable {
+                textureView.surfaceTextureListener = null
+            }
+        }
     }
 }

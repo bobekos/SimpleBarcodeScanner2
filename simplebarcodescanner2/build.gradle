@@ -25,18 +25,22 @@ android {
 }
 
 dependencies {
+    def firebase_ml_version = "20.0.0"
     def camerax_version = "1.0.0-alpha01"
+
+    def rxjava_version = "2.2.8"
+    def rxandroid_version = "2.1.1"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.core:core-ktx:1.0.2'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-    
+
     api "androidx.camera:camera-core:${camerax_version}"
     api "androidx.camera:camera-camera2:${camerax_version}"
 
-    api 'com.google.firebase:firebase-ml-vision:20.0.0'
+    api "com.google.firebase:firebase-ml-vision:${firebase_ml_version}"
+
+    api "io.reactivex.rxjava2:rxjava:${rxjava_version}"
+    api "io.reactivex.rxjava2:rxandroid:${rxandroid_version}"
 }
