@@ -4,14 +4,20 @@ import android.media.Image
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
+import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import java.util.concurrent.atomic.AtomicBoolean
 
-class BarcodeScanner(private val config: ScannerConfig) {
+class BarcodeScanner(config: ScannerConfig) {
 
     //TODO CONFIG
 
-    private val detector = FirebaseVision.getInstance().visionBarcodeDetector
+    private val detectorOptions = FirebaseVisionBarcodeDetectorOptions.Builder()
+        .setBarcodeFormats(config.barcodeFormat.first(), *config.barcodeFormat.drop(1).toIntArray())
+        .build()
+
+    private val detector = FirebaseVision.getInstance()
+        .getVisionBarcodeDetector(detectorOptions)
 
     private val isProcessing = AtomicBoolean(false)
 

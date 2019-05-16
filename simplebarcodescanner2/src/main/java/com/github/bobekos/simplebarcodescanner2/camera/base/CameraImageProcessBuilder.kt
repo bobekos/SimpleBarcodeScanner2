@@ -12,7 +12,7 @@ open class CameraImageProcessBuilder<T> {
         const val IMAGE_PROCESS_RESOLUTION_HEIGHT = 360
     }
 
-    fun setImageProcessListener(block: (image: T, firebaseRotation: Int) -> Unit) {
+    fun setImageProcessListener(block: (image: T, imageRotation: Int) -> Unit) {
         imageProcessCallback = block
     }
 
