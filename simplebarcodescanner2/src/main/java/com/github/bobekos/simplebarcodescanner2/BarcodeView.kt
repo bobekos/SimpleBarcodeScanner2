@@ -30,19 +30,16 @@ class BarcodeView : FrameLayout, LifecycleOwner {
         init()
     }
 
-    private lateinit var lifecycleRegistry: LifecycleRegistry
     private lateinit var textureView: TextureView
+    private lateinit var lifecycleRegistry: LifecycleRegistry
 
-    private val defaultConfig by lazy {
-        ScannerConfig(Size(context.resources.displayMetrics.widthPixels, context.resources.displayMetrics.heightPixels))
-    }
+    private val defaultConfig = ScannerConfig()
+    private val barcodeScanner = BarcodeScanner(defaultConfig)
 
+    //TODO
     private val cameraSource by lazy {
-        Camera2Source(defaultConfig)
-    }
-
-    private val barcodeScanner by lazy {
-        BarcodeScanner(defaultConfig)
+        val dm = context.resources.displayMetrics
+        Camera2Source(Size(dm.widthPixels, dm.heightPixels), defaultConfig)
     }
 
     override fun getLifecycle(): Lifecycle = lifecycleRegistry
@@ -51,6 +48,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
         setBackgroundColor(Color.BLACK)
 
         lifecycleRegistry = LifecycleRegistry(this)
+
         textureView = TextureView(context)
 
         addView(textureView)
@@ -70,7 +68,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                     lifecycleRegistry.markState(Lifecycle.State.DESTROYED)
 
                     emitter.isNotDisposed {
-                        //onNext(BarcodeSurface.Disposed)
+                        cameraSource.clear()
                     }
 
                     return true
@@ -82,8 +80,8 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
                     cameraSource
                         .build(this@BarcodeView, textureView, width, height)
-                        .onImageProcessing { image, firebaseRotation ->
-                            barcodeScanner.processImage(image, firebaseRotation) { barcode ->
+                        .onImageProcessing { image, rotation ->
+                            barcodeScanner.processImage(image, rotation) { barcode ->
                                 emitter.isNotDisposed {
                                     onNext(barcode)
                                 }
@@ -93,7 +91,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
             }
 
             emitter.setCancellable {
-                textureView.surfaceTextureListener = null
+                //textureView.surfaceTextureListener = null
             }
         }
     }
