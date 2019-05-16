@@ -4,7 +4,6 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.view.TextureView
 import com.github.bobekos.simplebarcodescanner2.utils.DisplayRotation
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
 
 abstract class CameraBuilder<T, X> {
 
@@ -15,7 +14,7 @@ abstract class CameraBuilder<T, X> {
 
     abstract fun createPreview(textureView: TextureView, width: Int, height: Int): T
 
-    abstract fun createImageAnalyzer(handler: Handler, block: (image: FirebaseVisionImage) -> Unit): X
+    abstract fun createImageAnalyzer(handler: Handler): X
 
     fun getPreview(textureView: TextureView, width: Int, height: Int): T {
         displayRotation = DisplayRotation(textureView.display)
@@ -23,9 +22,9 @@ abstract class CameraBuilder<T, X> {
         return createPreview(textureView, width, height)
     }
 
-    fun getImageProcessor(block: (image: FirebaseVisionImage) -> Unit): X {
+    fun getImageProcessor(): X {
         imageProcessingThread.start()
 
-        return createImageAnalyzer(Handler(imageProcessingThread.looper), block)
+        return createImageAnalyzer(Handler(imageProcessingThread.looper))
     }
 }

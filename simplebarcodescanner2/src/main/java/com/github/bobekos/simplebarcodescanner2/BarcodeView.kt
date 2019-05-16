@@ -15,8 +15,6 @@ import com.github.bobekos.simplebarcodescanner2.scanner.BarcodeScanner
 import com.github.bobekos.simplebarcodescanner2.utils.isNotDisposed
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import io.reactivex.Observable
-import io.reactivex.Scheduler
-import io.reactivex.schedulers.Schedulers
 
 class BarcodeView : FrameLayout, LifecycleOwner {
 
@@ -82,13 +80,15 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                     lifecycleRegistry.markState(Lifecycle.State.CREATED)
                     lifecycleRegistry.markState(Lifecycle.State.STARTED)
 
-                    cameraSource.create(this@BarcodeView, textureView, width, height) { image ->
-                        barcodeScanner.create(image) { barcode ->
-                            emitter.isNotDisposed {
-                                onNext(barcode)
+                    cameraSource
+                        .build(this@BarcodeView, textureView, width, height)
+                        .onImageProcessing { image, firebaseRotation ->
+                            barcodeScanner.processImage(image, firebaseRotation) { barcode ->
+                                emitter.isNotDisposed {
+                                    onNext(barcode)
+                                }
                             }
                         }
-                    }
                 }
             }
 

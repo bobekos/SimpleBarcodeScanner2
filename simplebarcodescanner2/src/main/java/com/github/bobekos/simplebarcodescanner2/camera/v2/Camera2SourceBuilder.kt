@@ -6,16 +6,14 @@ import android.util.Rational
 import android.util.Size
 import android.view.TextureView
 import androidx.camera.core.CameraX
-import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.core.PreviewConfig
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraBuilder
 import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
 import com.github.bobekos.simplebarcodescanner2.utils.fdiv
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
 
-class Camera2SourceBuilder(private val config: ScannerConfig) : CameraBuilder<Preview, ImageAnalysis>() {
+class Camera2SourceBuilder(private val config: ScannerConfig) : CameraBuilder<Preview, Camera2ImageProcessor>() {
 
     private val previewConfig = PreviewConfig.Builder()
         .setLensFacing(getFacing(config.lensFacing))
@@ -35,14 +33,8 @@ class Camera2SourceBuilder(private val config: ScannerConfig) : CameraBuilder<Pr
         return preview
     }
 
-    override fun createImageAnalyzer(handler: Handler, block: (image: FirebaseVisionImage) -> Unit): ImageAnalysis {
-        val imageProcessor = Camera2ImageProcessor(handler, getFacing(config.lensFacing))
-
-        imageProcessor.setImageProcessListener {
-            block(it)
-        }
-
-        return imageProcessor.imageAnalysis
+    override fun createImageAnalyzer(handler: Handler): Camera2ImageProcessor {
+        return Camera2ImageProcessor(handler, getFacing(config.lensFacing))
     }
 
     private fun getFacing(facing: CameraFacing): CameraX.LensFacing {
