@@ -79,9 +79,9 @@ class Camera2SourceBuilder(displaySize: Size, private val config: ScannerConfig)
         val yScale = scaledHeight.fdiv(parentViewHeight)
 
         if (displayRotation.isPortrait()) {
-            matrix.postScale(xScale, yScale, centerX, centerY)
+            matrix.preScale(xScale, yScale, centerX, centerY)
         } else {
-            matrix.postScale(yScale, xScale, centerX, centerY)
+            matrix.preScale(yScale, xScale, centerX, centerY)
         }
 
         textureView.setTransform(matrix)

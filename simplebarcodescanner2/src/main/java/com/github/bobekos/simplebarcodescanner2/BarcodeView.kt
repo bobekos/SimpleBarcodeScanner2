@@ -38,8 +38,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
     //TODO
     private val cameraSource by lazy {
-        val dm = context.resources.displayMetrics
-        Camera2Source(Size(dm.widthPixels, dm.heightPixels), defaultConfig)
+        Camera2Source(context, defaultConfig)
     }
 
     override fun getLifecycle(): Lifecycle = lifecycleRegistry
