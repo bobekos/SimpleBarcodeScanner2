@@ -5,7 +5,7 @@ import android.view.Surface
 
 class DisplayRotation(private val display: Display?) {
 
-    fun test(): Int {
+    fun getDisplayRotation(): Int {
         return display?.rotation ?: Surface.ROTATION_0
     }
 
