@@ -19,7 +19,6 @@ class Camera2SourceBuilder(displaySize: Size, private val config: ScannerConfig)
         CameraBuilder<Preview, Camera2ImageProcessor>() {
 
     private val targetSize: Size = config.previewSize ?: displaySize
-    //private val targetSize: Size = Size(1080, 2065)
 
     private val previewConfig = PreviewConfig.Builder()
             .setLensFacing(getFacing(config.lensFacing))
@@ -33,7 +32,7 @@ class Camera2SourceBuilder(displaySize: Size, private val config: ScannerConfig)
         preview.setOnPreviewOutputUpdateListener {
             textureView.surfaceTexture = it.surfaceTexture
 
-            updateTextureViewNew(textureView, it.textureSize, width, height)
+            updateTextureView(textureView, it.textureSize, width, height)
         }
 
         return preview
@@ -50,75 +49,41 @@ class Camera2SourceBuilder(displaySize: Size, private val config: ScannerConfig)
         }
     }
 
-    private fun updateTextureViewNew(
-            textureView: TextureView,
-            textureSize: Size,
-            parentViewWidth: Int,
-            parentViewHeight: Int
-    ) {
-        var pWidth = textureSize.width
-        var pHeight = textureSize.height
-
-        val ratioSurface = parentViewWidth.fdiv(parentViewHeight)
-        val ratioPreview = pWidth.fdiv(pHeight)
-
-        val scaleX: Float
-        val scaleY: Float
-
-        if (ratioSurface > ratioPreview) {
-            scaleX = parentViewHeight.fdiv(pHeight)
-            scaleY = 1f
-        } else {
-            scaleX = 1f
-            scaleY = parentViewHeight.fdiv(pWidth)
-        }
-
-        val matrix = Matrix()
-
-        if (displayRotation.isLandscape()) {
-            matrix.postRotate(90f * (displayRotation.getDisplayRotation() - 2), parentViewWidth.toFloat(), parentViewHeight.toFloat())
-        }
-
-        matrix.setScale(scaleX, scaleY)
-        textureView.setTransform(matrix)
-
-//        val scaledWidth = parentViewWidth * scaleX
-//        val scaledHeight = parentViewHeight * scaleY
-//
-//        val dx = (parentViewWidth - scaledWidth).div(2)
-//        val dy = (parentViewHeight - scaledHeight).div(2)
-//
-//        textureView.translationX = dx
-//        textureView.translationZ = dy
-    }
-
     private fun updateTextureView(
             textureView: TextureView,
             textureSize: Size,
             parentViewWidth: Int,
             parentViewHeight: Int
     ) {
-        val matrix = Matrix()
+        var previewWidth = textureSize.width
+        var previewHeight = textureSize.height
 
-        val rectView = RectF(0f, 0f, parentViewWidth.toFloat(), parentViewHeight.toFloat())
-        val viewCenterX = rectView.centerX()
-        val viewCenterY = rectView.centerY()
-
-        val rectPreview = RectF(0f, 0f, textureSize.height.toFloat(), textureSize.width.toFloat())
-        val previewCenterX = rectPreview.centerX()
-        val previewCenterY = rectPreview.centerY()
-
-        rectPreview.offset(viewCenterX - previewCenterX, viewCenterY - previewCenterY)
-        matrix.setRectToRect(rectView, rectPreview, Matrix.ScaleToFit.FILL)
-
-        val scaleX = parentViewHeight.fdiv(textureSize.height)
-        val scaleY = parentViewHeight.fdiv(textureSize.width)
-
-        matrix.postScale(1f, scaleY, viewCenterX, viewCenterY)
-
-        if (displayRotation.isLandscape()) {
-            matrix.postRotate(90f * (displayRotation.getDisplayRotation() - 2), viewCenterX, viewCenterY)
+        if (displayRotation.isPortrait()) {
+            previewWidth = textureSize.height
+            previewHeight = textureSize.width
         }
+
+        val surfaceWidthRatio = parentViewWidth.fdiv(previewWidth)
+        val surfaceHeightRatio = parentViewHeight.fdiv(previewHeight)
+
+        val surfaceScaleX: Float
+        val surfaceScaleY: Float
+
+        if (surfaceWidthRatio > surfaceHeightRatio) {
+            surfaceScaleX = 1f
+            surfaceScaleY = (previewHeight * surfaceWidthRatio).div(parentViewHeight)
+        } else {
+            surfaceScaleX = (previewWidth * surfaceHeightRatio).div(previewWidth)
+            surfaceScaleY = 1f
+        }
+
+
+        val centerX = parentViewWidth.fdiv(2)
+        val centerY = parentViewHeight.fdiv(2)
+
+        val matrix = Matrix()
+        matrix.postRotate(-displayRotation.getSurfaceRotation(), centerX, centerY)
+        matrix.preScale(surfaceScaleX, surfaceScaleY, centerX, centerY)
 
         textureView.setTransform(matrix)
     }
