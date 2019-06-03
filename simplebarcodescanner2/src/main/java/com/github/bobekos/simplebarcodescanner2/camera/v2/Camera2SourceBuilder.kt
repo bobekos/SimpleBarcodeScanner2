@@ -14,10 +14,10 @@ import com.github.bobekos.simplebarcodescanner2.camera.base.CameraBuilder
 import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
 import com.github.bobekos.simplebarcodescanner2.utils.fdiv
 
-class Camera2SourceBuilder(ctx: Context, private val config: ScannerConfig) :
-    CameraBuilder<Preview, Camera2ImageProcessor>(ctx) {
+class Camera2SourceBuilder(private val config: ScannerConfig, displaySize: Size) :
+    CameraBuilder<Preview, Camera2ImageProcessor>() {
 
-    private val targetSize: Size = config.previewSize ?: getDisplaySize()
+    private val targetSize: Size = config.previewSize ?: displaySize
 
     private val previewConfig = PreviewConfig.Builder()
         .setLensFacing(getFacing(config.lensFacing))
