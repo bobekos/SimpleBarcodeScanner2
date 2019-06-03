@@ -10,8 +10,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class BarcodeScanner(config: ScannerConfig) {
 
-    //TODO CONFIG
-
     private val detectorOptions = FirebaseVisionBarcodeDetectorOptions.Builder()
         .setBarcodeFormats(config.barcodeFormat.first(), *config.barcodeFormat.drop(1).toIntArray())
         .build()

@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.SurfaceTexture
 import android.util.AttributeSet
-import android.util.Size
 import android.view.TextureView
 import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
@@ -12,6 +11,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import com.github.bobekos.simplebarcodescanner2.camera.v2.Camera2Source
 import com.github.bobekos.simplebarcodescanner2.scanner.BarcodeScanner
+import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
 import com.github.bobekos.simplebarcodescanner2.utils.isNotDisposed
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import io.reactivex.Observable
@@ -53,6 +53,10 @@ class BarcodeView : FrameLayout, LifecycleOwner {
         addView(textureView)
     }
 
+    fun setFacing(facing: CameraFacing) = apply {
+        defaultConfig.lensFacing = facing
+    }
+
     fun getObservable(): Observable<FirebaseVisionBarcode> {
         return Observable.create<FirebaseVisionBarcode> { emitter ->
             textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
@@ -92,6 +96,8 @@ class BarcodeView : FrameLayout, LifecycleOwner {
             emitter.setCancellable {
                 //textureView.surfaceTextureListener = null
             }
+        }.distinctUntilChanged { barcode1, barcode2 ->
+            barcode1.rawValue == barcode2.rawValue
         }
     }
 }

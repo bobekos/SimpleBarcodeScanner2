@@ -1,11 +1,10 @@
 package com.github.bobekos.simplebarcodescanner2.camera.v2
 
+import android.content.Context
 import android.graphics.Matrix
-import android.graphics.RectF
 import android.os.Handler
 import android.util.Rational
 import android.util.Size
-import android.view.Surface
 import android.view.TextureView
 import androidx.camera.core.CameraX
 import androidx.camera.core.Preview
@@ -15,16 +14,16 @@ import com.github.bobekos.simplebarcodescanner2.camera.base.CameraBuilder
 import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
 import com.github.bobekos.simplebarcodescanner2.utils.fdiv
 
-class Camera2SourceBuilder(displaySize: Size, private val config: ScannerConfig) :
-        CameraBuilder<Preview, Camera2ImageProcessor>() {
+class Camera2SourceBuilder(ctx: Context, private val config: ScannerConfig) :
+    CameraBuilder<Preview, Camera2ImageProcessor>(ctx) {
 
-    private val targetSize: Size = config.previewSize ?: displaySize
+    private val targetSize: Size = config.previewSize ?: getDisplaySize()
 
     private val previewConfig = PreviewConfig.Builder()
-            .setLensFacing(getFacing(config.lensFacing))
-            .setTargetResolution(targetSize)
-            .setTargetAspectRatio(Rational(targetSize.width, targetSize.height))
-            .build()
+        .setLensFacing(getFacing(config.lensFacing))
+        .setTargetResolution(targetSize)
+        .setTargetAspectRatio(Rational(targetSize.width, targetSize.height))
+        .build()
 
     override fun createPreview(textureView: TextureView, width: Int, height: Int): Preview {
         val preview = Preview(previewConfig)
@@ -50,10 +49,10 @@ class Camera2SourceBuilder(displaySize: Size, private val config: ScannerConfig)
     }
 
     private fun updateTextureView(
-            textureView: TextureView,
-            textureSize: Size,
-            parentViewWidth: Int,
-            parentViewHeight: Int
+        textureView: TextureView,
+        textureSize: Size,
+        parentViewWidth: Int,
+        parentViewHeight: Int
     ) {
         var previewWidth = textureSize.width
         var previewHeight = textureSize.height
@@ -76,7 +75,6 @@ class Camera2SourceBuilder(displaySize: Size, private val config: ScannerConfig)
             surfaceScaleX = (previewWidth * surfaceHeightRatio).div(previewWidth)
             surfaceScaleY = 1f
         }
-
 
         val centerX = parentViewWidth.fdiv(2)
         val centerY = parentViewHeight.fdiv(2)
