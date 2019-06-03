@@ -5,7 +5,7 @@ import android.os.HandlerThread
 import android.view.TextureView
 import com.github.bobekos.simplebarcodescanner2.utils.DisplayRotation
 
-abstract class CameraBuilder<T, X> {
+abstract class CameraBuilder<T, X>() {
 
     private val imageProcessingThread = HandlerThread("CameraImageProcessingThread")
 
