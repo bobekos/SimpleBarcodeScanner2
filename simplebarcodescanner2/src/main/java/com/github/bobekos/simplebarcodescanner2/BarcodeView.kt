@@ -39,12 +39,12 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     private lateinit var textureView: TextureView
     private lateinit var lifecycleRegistry: LifecycleRegistry
 
-    private val defaultConfig = ScannerConfig()
+    private val config = ScannerConfig()
     private val overlayBuilder = OverlayBuilder()
-    private val barcodeScanner = BarcodeScanner(defaultConfig)
-    //TODO
+    private val barcodeScanner = BarcodeScanner(config)
+
     private val cameraSource by lazy {
-        Camera2Source(defaultConfig, getDisplaySize())
+        Camera2Source(config, getDisplaySize())
     }
 
     override fun getLifecycle(): Lifecycle = lifecycleRegistry
@@ -60,11 +60,11 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     }
 
     fun setFacing(facing: CameraFacing) = apply {
-        defaultConfig.lensFacing = facing
+        config.lensFacing = facing
     }
 
     fun drawOverlay(barcodeOverlay: BarcodeOverlay = BarcodeRectOverlay(context)) = apply {
-        defaultConfig.barcodeOverlay = barcodeOverlay
+        config.barcodeOverlay = barcodeOverlay
     }
 
     fun getObservable(): Observable<FirebaseVisionBarcode> {
@@ -92,19 +92,27 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                     lifecycleRegistry.markState(Lifecycle.State.STARTED)
 
                     overlayBuilder
-                        .createOverlayView(this@BarcodeView, width, height, defaultConfig.barcodeOverlay)
-                        .calculateOverlayScale(width, height, getDisplaySize())
+                        .createOverlayView(this@BarcodeView, config.barcodeOverlay)
+                        .calculateOverlayScale(width, height, config.scannerResolution)
+                        .checkOrientationAndFacing(context, config.lensFacing)
 
                     cameraSource
                         .build(this@BarcodeView, textureView, width, height)
                         .onImageProcessing { image, rotation ->
-                            barcodeScanner.processImage(image, rotation) { barcode ->
-                                emitter.isNotDisposed {
-                                    overlayBuilder.onBarcodeDetected(barcode, defaultConfig.barcodeOverlay)
-
-                                    onNext(barcode)
+                            barcodeScanner.processImage(image, rotation,
+                                barcodeListener = { barcode ->
+                                    emitter.isNotDisposed { onNext(barcode) }
+                                },
+                                overlayListener = { rectF, rawValue ->
+                                    emitter.isNotDisposed {
+                                        overlayBuilder.onBarcodeDetected(
+                                            rectF,
+                                            rawValue,
+                                            config.barcodeOverlay
+                                        )
+                                    }
                                 }
-                            }
+                            )
                         }
                 }
             }

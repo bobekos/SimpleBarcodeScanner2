@@ -1,70 +1,79 @@
 package com.github.bobekos.simplebarcodescanner2.overlay
 
-import android.graphics.Rect
+import android.content.Context
+import android.content.res.Configuration
+import android.graphics.RectF
 import android.util.Size
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.core.graphics.scaleMatrix
+import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
 import com.github.bobekos.simplebarcodescanner2.utils.fdiv
-import com.github.bobekos.simplebarcodescanner2.utils.getNullSafeBoundingBox
-import com.github.bobekos.simplebarcodescanner2.utils.getNullSafeRawValue
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 
 class OverlayBuilder {
+
+    private var textureWidth: Int = 0
+    private var textureHeight: Int = 0
 
     private var xScaleFactorP: Float = 0f
     private var xScaleFactorL: Float = 0f
     private var yScaleFactorP: Float = 0f
     private var yScaleFactorL: Float = 0f
 
-    fun createOverlayView(root: FrameLayout, width: Int, height: Int, overlay: BarcodeOverlay?) = apply {
+    private var isPortrait: Boolean = true
+    private var cameraFacing: CameraFacing = CameraFacing.BACK
+
+    fun createOverlayView(root: FrameLayout, overlay: BarcodeOverlay?) = apply {
         if (overlay == null) {
             return this
         }
 
         root.removeView(overlay as View)
-        root.addView(overlay, width, height)
+        root.addView(overlay, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     }
 
-    fun calculateOverlayScale(width: Int, height: Int, displaySize: Size) {
-        xScaleFactorP = width.fdiv(Math.min(displaySize.width, displaySize.height))
-        xScaleFactorL = width.fdiv(Math.max(displaySize.width, displaySize.height))
-        yScaleFactorP = height.fdiv(Math.max(displaySize.width, displaySize.height))
-        yScaleFactorL = height.fdiv(Math.min(displaySize.width, displaySize.height))
+    fun calculateOverlayScale(width: Int, height: Int, scannerResolution: Size) = apply {
+        textureWidth = width
+        textureHeight = height
+
+        val max = Math.max(scannerResolution.width, scannerResolution.height)
+        val min = Math.min(scannerResolution.width, scannerResolution.height)
+
+        xScaleFactorP = textureWidth.fdiv(min)
+        xScaleFactorL = textureWidth.fdiv(max)
+        yScaleFactorP = textureHeight.fdiv(max)
+        yScaleFactorL = textureHeight.fdiv(min)
     }
 
-    fun onBarcodeDetected(barcode: FirebaseVisionBarcode, overlay: BarcodeOverlay?) {
+    fun checkOrientationAndFacing(ctx: Context, facing: CameraFacing) {
+        isPortrait = ctx.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        cameraFacing = facing
+    }
+
+    fun onBarcodeDetected(barcodeRect: RectF, rawValue: String, overlay: BarcodeOverlay?) {
         if (overlay == null) {
             return
         }
 
-        val rect = Rect(barcode.getNullSafeBoundingBox()).apply {
-            left = translateX(left)
-            top = translateY(top)
-            right = translateX(right)
-            bottom = translateY(bottom)
-        }
+        barcodeRect.left = translateX(barcodeRect.left)
+        barcodeRect.top = translateY(barcodeRect.top)
+        barcodeRect.right = translateX(barcodeRect.right)
+        barcodeRect.bottom = translateY(barcodeRect.bottom)
 
-        overlay.onUpdate(rect, barcode.getNullSafeRawValue())
+        overlay.onUpdate(barcodeRect, rawValue)
     }
 
-    private fun translateX(x: Int): Int {
-        var result = (x * if (isPortraitMode()) xScaleFactorP else xScaleFactorL).toInt()
+    private fun translateX(x: Float): Float {
+        var result = (x * if (isPortrait) xScaleFactorP else xScaleFactorL)
 
-        /*
-        if (Camera.isFacingFront(config.facing)) {
-            result = cameraView.width - result
+        if (cameraFacing == CameraFacing.FRONT) {
+            result = textureWidth - result
         }
-         */
 
         return result
     }
 
-    private fun translateY(y: Int): Int {
-        return (y * if (isPortraitMode()) yScaleFactorP else yScaleFactorL).toInt()
-    }
-
-    private fun isPortraitMode(): Boolean {
-        return true
+    private fun translateY(y: Float): Float {
+        return (y * if (isPortrait) yScaleFactorP else yScaleFactorL)
     }
 }

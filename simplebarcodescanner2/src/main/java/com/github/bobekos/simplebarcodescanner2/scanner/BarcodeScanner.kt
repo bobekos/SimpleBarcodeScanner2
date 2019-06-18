@@ -1,7 +1,10 @@
 package com.github.bobekos.simplebarcodescanner2.scanner
 
+import android.graphics.RectF
 import android.media.Image
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
+import com.github.bobekos.simplebarcodescanner2.utils.getBoundingBoxF
+import com.github.bobekos.simplebarcodescanner2.utils.getRawValueOrEmpty
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
@@ -19,8 +22,12 @@ class BarcodeScanner(config: ScannerConfig) {
 
     private val isProcessing = AtomicBoolean(false)
 
-    fun processImage(image: Image, rotation: Int, block: (barcode: FirebaseVisionBarcode) -> Unit) {
+    fun processImage(image: Image, rotation: Int,
+                     barcodeListener: (barcode: FirebaseVisionBarcode) -> Unit,
+                     overlayListener: (rectF: RectF, rawValue: String) -> Unit) {
         if (isProcessing.compareAndSet(false, true)) {
+            overlayListener(RectF(), "")
+
             return
         }
 
@@ -28,12 +35,12 @@ class BarcodeScanner(config: ScannerConfig) {
 
         detector.detectInImage(visionImage)
             .addOnSuccessListener { result ->
-                result?.forEach(block)
+                result?.forEach {
+                    barcodeListener(it)
+                    overlayListener(it.getBoundingBoxF(), it.getRawValueOrEmpty())
+                }
 
                 isProcessing.set(false)
-            }
-            .addOnFailureListener {
-                //TODO
             }
     }
 }

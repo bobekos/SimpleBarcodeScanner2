@@ -3,6 +3,7 @@ package com.github.bobekos.simplebarcodescannerexample
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import com.github.bobekos.simplebarcodescanner2.overlay.BarcodeRectOverlay
 import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -24,12 +25,12 @@ class MainActivity : AppCompatActivity() {
 
         disposable = barcodeView
             .setFacing(CameraFacing.BACK)
-            .drawOverlay()
             .getObservable()
-            .observeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 {
                     Log.e("MainActivity", "Barcode: ${it.displayValue}")
+                    Toast.makeText(this, "Jo jo", Toast.LENGTH_SHORT).show()
                 },
                 {
                     Log.e("MainActivity", "", it)
