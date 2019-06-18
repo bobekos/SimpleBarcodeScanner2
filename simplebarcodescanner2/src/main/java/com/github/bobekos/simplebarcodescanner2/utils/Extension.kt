@@ -1,6 +1,6 @@
 package com.github.bobekos.simplebarcodescanner2.utils
 
-import android.graphics.Rect
+import android.graphics.RectF
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import io.reactivex.ObservableEmitter
 
@@ -12,10 +12,10 @@ inline fun <T> ObservableEmitter<T>.isNotDisposed(block: ObservableEmitter<T>.()
     }
 }
 
-fun FirebaseVisionBarcode.getNullSafeBoundingBox(): Rect {
-    return boundingBox ?: Rect()
+fun FirebaseVisionBarcode.getBoundingBoxF(): RectF {
+    return RectF(boundingBox)
 }
 
-fun FirebaseVisionBarcode.getNullSafeRawValue(): String {
+fun FirebaseVisionBarcode.getRawValueOrEmpty(): String {
     return rawValue ?: ""
 }

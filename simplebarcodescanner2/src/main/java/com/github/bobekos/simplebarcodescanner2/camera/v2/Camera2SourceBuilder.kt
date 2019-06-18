@@ -1,6 +1,5 @@
 package com.github.bobekos.simplebarcodescanner2.camera.v2
 
-import android.content.Context
 import android.graphics.Matrix
 import android.os.Handler
 import android.util.Rational
@@ -17,12 +16,10 @@ import com.github.bobekos.simplebarcodescanner2.utils.fdiv
 class Camera2SourceBuilder(private val config: ScannerConfig, displaySize: Size) :
     CameraBuilder<Preview, Camera2ImageProcessor>() {
 
-    private val targetSize: Size = config.previewSize ?: displaySize
-
     private val previewConfig = PreviewConfig.Builder()
         .setLensFacing(getFacing(config.lensFacing))
-        .setTargetResolution(targetSize)
-        .setTargetAspectRatio(Rational(targetSize.width, targetSize.height))
+        .setTargetResolution(displaySize)
+        .setTargetAspectRatio(Rational(displaySize.width, displaySize.height))
         .build()
 
     override fun createPreview(textureView: TextureView, width: Int, height: Int): Preview {
@@ -38,7 +35,7 @@ class Camera2SourceBuilder(private val config: ScannerConfig, displaySize: Size)
     }
 
     override fun createImageAnalyzer(handler: Handler): Camera2ImageProcessor {
-        return Camera2ImageProcessor(handler, getFacing(config.lensFacing))
+        return Camera2ImageProcessor(handler, getFacing(config.lensFacing), config.scannerResolution)
     }
 
     private fun getFacing(facing: CameraFacing): CameraX.LensFacing {

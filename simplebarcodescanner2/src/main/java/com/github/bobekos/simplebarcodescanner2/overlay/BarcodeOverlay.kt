@@ -1,7 +1,7 @@
 package com.github.bobekos.simplebarcodescanner2.overlay
 
-import android.graphics.Rect
+import android.graphics.RectF
 
 interface BarcodeOverlay {
-    fun onUpdate(posRect: Rect = Rect(), barcodeValue: String = "")
+    fun onUpdate(posRect: RectF = RectF(), barcodeValue: String = "")
 }

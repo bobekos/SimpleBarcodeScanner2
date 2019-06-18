@@ -1,10 +1,7 @@
 package com.github.bobekos.simplebarcodescanner2.overlay
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
@@ -15,7 +12,7 @@ class BarcodeRectOverlay : View, BarcodeOverlay {
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    private lateinit var rect: Rect
+    private lateinit var rect: RectF
 
     private val paint by lazy {
         Paint().apply {
@@ -29,7 +26,7 @@ class BarcodeRectOverlay : View, BarcodeOverlay {
         setWillNotDraw(false)
     }
 
-    override fun onUpdate(posRect: Rect, barcodeValue: String) {
+    override fun onUpdate(posRect: RectF, barcodeValue: String) {
         rect = posRect
         invalidate()
     }
