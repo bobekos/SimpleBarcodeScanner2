@@ -25,8 +25,8 @@ android {
 }
 
 dependencies {
-    def firebase_ml_version = "20.0.0"
-    def camerax_version = "1.0.0-alpha02"
+    def firebase_ml_version = "21.0.0"
+    def camerax_version = "1.0.0-alpha03"
 
     def rxjava_version = "2.2.8"
     def rxandroid_version = "2.1.1"
