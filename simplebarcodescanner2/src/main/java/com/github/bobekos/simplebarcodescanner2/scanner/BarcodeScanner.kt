@@ -6,7 +6,6 @@ import com.github.bobekos.simplebarcodescanner2.ScannerConfig
 import com.github.bobekos.simplebarcodescanner2.utils.getBoundingBoxF
 import com.github.bobekos.simplebarcodescanner2.utils.getRawValueOrEmpty
 import com.google.firebase.ml.vision.FirebaseVision
-import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import java.util.concurrent.atomic.AtomicBoolean
@@ -22,12 +21,12 @@ class BarcodeScanner(config: ScannerConfig) {
 
     private val isProcessing = AtomicBoolean(false)
 
-    fun processImage(image: Image, rotation: Int,
-                     barcodeListener: (barcode: FirebaseVisionBarcode) -> Unit,
-                     overlayListener: (rectF: RectF, rawValue: String) -> Unit) {
+    fun processImage(
+        image: Image, rotation: Int,
+        barcodeResultListener: (barcodeResult: BarcodeResult) -> Unit,
+        overlayListener: (rectF: RectF, rawValue: String) -> Unit
+    ) {
         if (isProcessing.compareAndSet(false, true)) {
-            overlayListener(RectF(), "")
-
             return
         }
 
@@ -35,9 +34,14 @@ class BarcodeScanner(config: ScannerConfig) {
 
         detector.detectInImage(visionImage)
             .addOnSuccessListener { result ->
-                result?.forEach {
-                    barcodeListener(it)
-                    overlayListener(it.getBoundingBoxF(), it.getRawValueOrEmpty())
+                if (result == null || result.isEmpty()) {
+                    barcodeResultListener(BarcodeResult.Empty)
+                    overlayListener(RectF(), "")
+                } else {
+                    result.forEach {
+                        barcodeResultListener(BarcodeResult.Data(it))
+                        overlayListener(it.getBoundingBoxF(), it.getRawValueOrEmpty())
+                    }
                 }
 
                 isProcessing.set(false)

@@ -16,6 +16,7 @@ import com.github.bobekos.simplebarcodescanner2.camera.v2.Camera2Source
 import com.github.bobekos.simplebarcodescanner2.overlay.BarcodeOverlay
 import com.github.bobekos.simplebarcodescanner2.overlay.BarcodeRectOverlay
 import com.github.bobekos.simplebarcodescanner2.overlay.OverlayBuilder
+import com.github.bobekos.simplebarcodescanner2.scanner.BarcodeResult
 import com.github.bobekos.simplebarcodescanner2.scanner.BarcodeScanner
 import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
 import com.github.bobekos.simplebarcodescanner2.utils.isNotDisposed
@@ -32,7 +33,11 @@ class BarcodeView : FrameLayout, LifecycleOwner {
         init()
     }
 
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
         init()
     }
 
@@ -68,9 +73,13 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     }
 
     fun getObservable(): Observable<FirebaseVisionBarcode> {
-        return Observable.create<FirebaseVisionBarcode> { emitter ->
+        return Observable.create<BarcodeResult> { emitter ->
             textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
-                override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture?, width: Int, height: Int) {
+                override fun onSurfaceTextureSizeChanged(
+                    surface: SurfaceTexture?,
+                    width: Int,
+                    height: Int
+                ) {
                     //TODO
                 }
 
@@ -87,7 +96,11 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                     return true
                 }
 
-                override fun onSurfaceTextureAvailable(surface: SurfaceTexture?, width: Int, height: Int) {
+                override fun onSurfaceTextureAvailable(
+                    surface: SurfaceTexture?,
+                    width: Int,
+                    height: Int
+                ) {
                     lifecycleRegistry.markState(Lifecycle.State.CREATED)
                     lifecycleRegistry.markState(Lifecycle.State.STARTED)
 
@@ -100,8 +113,8 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                         .build(this@BarcodeView, textureView, width, height)
                         .onImageProcessing { image, rotation ->
                             barcodeScanner.processImage(image, rotation,
-                                barcodeListener = { barcode ->
-                                    emitter.isNotDisposed { onNext(barcode) }
+                                barcodeResultListener = { barcodeResult ->
+                                    emitter.isNotDisposed { onNext(barcodeResult) }
                                 },
                                 overlayListener = { rectF, rawValue ->
                                     emitter.isNotDisposed {
@@ -120,8 +133,12 @@ class BarcodeView : FrameLayout, LifecycleOwner {
             emitter.setCancellable {
                 //textureView.surfaceTextureListener = null
             }
-        }.distinctUntilChanged { barcode1, barcode2 ->
-            barcode1.rawValue == barcode2.rawValue
+        }.distinctUntilChanged { result1, result2 ->
+            result1.rawValue == result2.rawValue
+        }.filter {
+            it is BarcodeResult.Data
+        }.map {
+            (it as BarcodeResult.Data).barcode
         }
     }
 
