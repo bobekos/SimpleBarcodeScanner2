@@ -2,6 +2,7 @@ package com.github.bobekos.simplebarcodescanner2.camera.v2
 
 import android.graphics.Matrix
 import android.os.Handler
+import android.util.Log
 import android.util.Rational
 import android.util.Size
 import android.view.TextureView
@@ -51,16 +52,15 @@ class Camera2SourceBuilder(private val config: ScannerConfig, displaySize: Size)
         parentViewWidth: Int,
         parentViewHeight: Int
     ) {
-        var previewWidth = textureSize.width
-        var previewHeight = textureSize.height
-
-        if (displayRotation.isPortrait()) {
-            previewWidth = textureSize.height
-            previewHeight = textureSize.width
-        }
+        val previewWidth = textureSize.height
+        val previewHeight = textureSize.width
 
         val surfaceWidthRatio = parentViewWidth.fdiv(previewWidth)
         val surfaceHeightRatio = parentViewHeight.fdiv(previewHeight)
+
+        Log.e("DebugCamera", "Perview x: $previewWidth y: $previewHeight")
+        Log.e("DebugCamera", "ParentView x: $parentViewWidth y: $parentViewHeight")
+        Log.e("DebugCamera", "x: $surfaceWidthRatio y: $surfaceHeightRatio")
 
         val surfaceScaleX: Float
         val surfaceScaleY: Float
