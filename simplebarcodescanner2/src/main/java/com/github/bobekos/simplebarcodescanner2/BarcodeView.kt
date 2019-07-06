@@ -22,6 +22,7 @@ import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
 import com.github.bobekos.simplebarcodescanner2.utils.isNotDisposed
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import io.reactivex.Observable
+import io.reactivex.ObservableEmitter
 
 class BarcodeView : FrameLayout, LifecycleOwner {
 
@@ -88,10 +89,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
                 override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
                     lifecycleRegistry.markState(Lifecycle.State.DESTROYED)
-
-                    emitter.isNotDisposed {
-                        cameraSource.clear()
-                    }
+                    cameraSource.clear()
 
                     return true
                 }
@@ -111,27 +109,13 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
                     cameraSource
                         .build(this@BarcodeView, textureView, width, height)
-                        .onImageProcessing { image, rotation ->
-                            barcodeScanner.processImage(image, rotation,
-                                barcodeResultListener = { barcodeResult ->
-                                    emitter.isNotDisposed { onNext(barcodeResult) }
-                                },
-                                overlayListener = { rectF, rawValue ->
-                                    emitter.isNotDisposed {
-                                        overlayBuilder.onBarcodeDetected(
-                                            rectF,
-                                            rawValue,
-                                            config.barcodeOverlay
-                                        )
-                                    }
-                                }
-                            )
-                        }
+
+                    processFrame(emitter)
                 }
             }
 
-            emitter.setCancellable {
-                //textureView.surfaceTextureListener = null
+            if (textureView.isAvailable) {
+                processFrame(emitter)
             }
         }.distinctUntilChanged { result1, result2 ->
             result1.rawValue == result2.rawValue
@@ -139,6 +123,25 @@ class BarcodeView : FrameLayout, LifecycleOwner {
             it is BarcodeResult.Data
         }.map {
             (it as BarcodeResult.Data).barcode
+        }
+    }
+
+    private fun processFrame(emitter: ObservableEmitter<BarcodeResult>) {
+        cameraSource.onImageProcessing { image, rotation ->
+            barcodeScanner.processImage(image, rotation,
+                barcodeResultListener = { barcodeResult ->
+                    emitter.isNotDisposed { onNext(barcodeResult) }
+                },
+                overlayListener = { rectF, rawValue ->
+                    emitter.isNotDisposed {
+                        overlayBuilder.onBarcodeDetected(
+                            rectF,
+                            rawValue,
+                            config.barcodeOverlay
+                        )
+                    }
+                }
+            )
         }
     }
 
