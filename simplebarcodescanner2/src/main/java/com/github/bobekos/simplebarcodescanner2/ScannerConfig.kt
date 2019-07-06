@@ -9,5 +9,6 @@ data class ScannerConfig(
     var scannerResolution: Size = Size(360, 720),
     var barcodeFormat: List<Int> = arrayListOf(FirebaseVisionBarcode.FORMAT_ALL_FORMATS),
     var lensFacing: CameraFacing = CameraFacing.BACK,
-    var barcodeOverlay: BarcodeOverlay? = null
+    var barcodeOverlay: BarcodeOverlay? = null,
+    var isFlashOn: Boolean = false
 )
