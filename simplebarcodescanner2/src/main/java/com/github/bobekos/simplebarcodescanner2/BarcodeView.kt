@@ -12,6 +12,9 @@ import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import com.github.bobekos.simplebarcodescanner2.camera.v1.Camera1Preview
+import com.github.bobekos.simplebarcodescanner2.camera.v1.Camera1Source
+import com.github.bobekos.simplebarcodescanner2.camera.v1.Camera1SourceBuilder
 import com.github.bobekos.simplebarcodescanner2.camera.v2.Camera2Source
 import com.github.bobekos.simplebarcodescanner2.overlay.BarcodeOverlay
 import com.github.bobekos.simplebarcodescanner2.overlay.BarcodeRectOverlay
@@ -50,7 +53,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     private val barcodeScanner = BarcodeScanner(config)
 
     private val cameraSource by lazy {
-        Camera2Source(config, getDisplaySize())
+        Camera1Source(config, getDisplaySize())
     }
 
     override fun getLifecycle(): Lifecycle = lifecycleRegistry
@@ -95,7 +98,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
                 override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
                     lifecycleRegistry.markState(Lifecycle.State.DESTROYED)
-                    cameraSource.clear()
+                    //cameraSource.clear()
 
                     return true
                 }
@@ -115,7 +118,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
                     cameraSource
                         .build(this@BarcodeView, textureView, width, height)
-                        .setConfigListener()
+                            //.setConfigListener()
 
                     processFrame(emitter)
                 }
@@ -134,6 +137,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     }
 
     private fun processFrame(emitter: ObservableEmitter<BarcodeResult>) {
+        /*
         cameraSource.onImageProcessing { image, rotation ->
             barcodeScanner.processImage(image, rotation,
                 barcodeResultListener = { barcodeResult ->
@@ -150,6 +154,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                 }
             )
         }
+         */
     }
 
     private fun getDisplaySize(): Size {
