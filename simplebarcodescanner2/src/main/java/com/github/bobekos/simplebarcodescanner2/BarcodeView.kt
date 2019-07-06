@@ -73,6 +73,12 @@ class BarcodeView : FrameLayout, LifecycleOwner {
         config.barcodeOverlay = barcodeOverlay
     }
 
+    fun enableFlash(isOn: Boolean) = apply {
+        config.isFlashOn = isOn
+
+        Camera2Source.updateByConfig(config)
+    }
+
     fun getObservable(): Observable<FirebaseVisionBarcode> {
         return Observable.create<BarcodeResult> { emitter ->
             textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
@@ -109,6 +115,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
                     cameraSource
                         .build(this@BarcodeView, textureView, width, height)
+                        .setConfigListener()
 
                     processFrame(emitter)
                 }

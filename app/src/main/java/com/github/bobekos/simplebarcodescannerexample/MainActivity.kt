@@ -16,12 +16,19 @@ class MainActivity : AppCompatActivity() {
 
     private var disposable: Disposable? = null
 
+    private var isFlashOn = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         test.setOnClickListener {
             startActivity(Intent(this, MainActivity2::class.java))
+        }
+
+        flash.setOnClickListener {
+            isFlashOn = !isFlashOn
+            barcodeView.enableFlash(isFlashOn)
         }
     }
 
@@ -30,6 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         disposable = barcodeView
             .setFacing(CameraFacing.BACK)
+            .enableFlash(isFlashOn)
             .getObservable()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
