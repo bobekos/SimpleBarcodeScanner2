@@ -15,7 +15,7 @@ class Camera1Source(private val config: ScannerConfig, displaySize: Size) {
         apply {
             preview = cameraBuilder.getPreview(textureView, width, height)
 
-            preview?.start()
+            preview?.bindToLifecycle(lifecycleOwner)
         }
 
 }
