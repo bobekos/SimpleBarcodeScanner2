@@ -10,12 +10,17 @@ class Camera1Source(private val config: ScannerConfig, displaySize: Size) {
     private val cameraBuilder = Camera1SourceBuilder(config, displaySize).build()
 
     private var preview: Camera1Preview? = null
+    private var processor: Camera1ImageProcessor? = null
 
     fun build(lifecycleOwner: LifecycleOwner, textureView: TextureView, width: Int, height: Int) =
         apply {
             preview = cameraBuilder.getPreview(textureView, width, height)
+            processor = cameraBuilder.getImageProcessor()
 
             preview?.bindToLifecycle(lifecycleOwner)
         }
 
+    fun onImageProcessing(block: (byteArray: ByteArray, imageRotation: Int) -> Unit) {
+        processor?.setImageProcessListener(block)
+    }
 }

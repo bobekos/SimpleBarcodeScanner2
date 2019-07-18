@@ -23,8 +23,8 @@ class Camera2ImageProcessor(handler: Handler, facing: CameraX.LensFacing, scanne
     val imageAnalysis = ImageAnalysis(config)
 
     init {
-        imageAnalysis.setAnalyzer { image, rotationDegrees ->
-            image?.image?.let {
+        imageAnalysis.setAnalyzer { frame, rotationDegrees ->
+            frame?.image?.let {
                 imageProcessCallback?.invoke(it, getVisionRotation(rotationDegrees))
             }
         }

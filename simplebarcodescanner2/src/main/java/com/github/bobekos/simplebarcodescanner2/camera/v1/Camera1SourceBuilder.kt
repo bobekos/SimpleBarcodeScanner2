@@ -44,7 +44,7 @@ class Camera1SourceBuilder(private val config: ScannerConfig, private val displa
     }
 
     override fun createImageAnalyzer(handler: Handler): Camera1ImageProcessor {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return Camera1ImageProcessor(camera, config.scannerResolution)
     }
 
     private fun getFacing(facing: CameraFacing): Int {

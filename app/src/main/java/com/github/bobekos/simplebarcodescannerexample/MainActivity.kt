@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         disposable = barcodeView
             .setFacing(CameraFacing.BACK)
+            .drawOverlay()
             .enableFlash(isFlashOn)
             .getObservable()
             .observeOn(AndroidSchedulers.mainThread())
