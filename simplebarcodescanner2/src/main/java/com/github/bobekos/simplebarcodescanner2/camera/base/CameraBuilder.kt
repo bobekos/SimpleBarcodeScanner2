@@ -33,12 +33,12 @@ abstract class CameraBuilder<T, X> {
 
     fun updateTextureView(
         textureView: TextureView,
-        textureSize: Size,
+        cameraPreviewSize: Size,
         parentViewWidth: Int,
         parentViewHeight: Int
     ) {
-        val previewWidth = textureSize.height
-        val previewHeight = textureSize.width
+        val previewWidth = cameraPreviewSize.height
+        val previewHeight = cameraPreviewSize.width
 
         val surfaceWidthRatio = parentViewWidth.fdiv(previewWidth)
         val surfaceHeightRatio = parentViewHeight.fdiv(previewHeight)

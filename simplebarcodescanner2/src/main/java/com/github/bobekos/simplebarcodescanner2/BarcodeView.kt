@@ -54,7 +54,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
     private val cameraSource: CameraSource by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Camera2Source(config, getDisplaySize())
+            Camera1Source(config, getDisplaySize())
         } else {
             Camera1Source(config, getDisplaySize())
         }
