@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Point
 import android.graphics.SurfaceTexture
+import android.os.Build
 import android.util.AttributeSet
 import android.util.Size
 import android.view.TextureView
@@ -12,6 +13,7 @@ import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import com.github.bobekos.simplebarcodescanner2.camera.base.CameraSource
 import com.github.bobekos.simplebarcodescanner2.camera.v1.Camera1Source
 import com.github.bobekos.simplebarcodescanner2.camera.v2.Camera2Source
 import com.github.bobekos.simplebarcodescanner2.overlay.BarcodeOverlay
@@ -50,8 +52,12 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     private val overlayBuilder = OverlayBuilder()
     private val barcodeScanner = BarcodeScanner(config)
 
-    private val cameraSource by lazy {
-        Camera1Source(config, getDisplaySize())
+    private val cameraSource: CameraSource by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Camera2Source(config, getDisplaySize())
+        } else {
+            Camera1Source(config, getDisplaySize())
+        }
     }
 
     override fun getLifecycle(): Lifecycle = lifecycleRegistry
@@ -77,7 +83,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     fun enableFlash(isOn: Boolean) = apply {
         config.isFlashOn = isOn
 
-        Camera2Source.updateByConfig(config)
+        CameraSource.updateByConfig(config)
     }
 
     fun getObservable(): Observable<FirebaseVisionBarcode> {
@@ -96,7 +102,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
                 override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
                     lifecycleRegistry.markState(Lifecycle.State.DESTROYED)
-                    //cameraSource.clear()
+                    cameraSource.clear()
 
                     return true
                 }
@@ -116,7 +122,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
                     cameraSource
                         .build(this@BarcodeView, textureView, width, height)
-                    //.setConfigListener()
+                        .setConfigListener()
 
                     processFrame(emitter)
                 }

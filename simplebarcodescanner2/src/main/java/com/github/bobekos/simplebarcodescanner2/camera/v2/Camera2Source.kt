@@ -1,6 +1,5 @@
 package com.github.bobekos.simplebarcodescanner2.camera.v2
 
-import android.media.Image
 import android.util.Size
 import android.view.TextureView
 import androidx.camera.core.CameraX
@@ -8,28 +7,21 @@ import androidx.camera.core.Preview
 import androidx.lifecycle.LifecycleOwner
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraImageConverter
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.PublishSubject
+import com.github.bobekos.simplebarcodescanner2.camera.base.CameraSource
 
-class Camera2Source(private val config: ScannerConfig, displaySize: Size) {
-
-    companion object {
-        private val updateSubject = PublishSubject.create<ScannerConfig>()
-
-        fun updateByConfig(config: ScannerConfig) {
-            updateSubject.onNext(config)
-        }
-    }
+class Camera2Source(config: ScannerConfig, displaySize: Size) : CameraSource(config) {
 
     private val cameraBuilder = Camera2SourceBuilder(config, displaySize)
 
     private var preview: Preview? = null
     private var processor: Camera2ImageProcessor? = null
 
-    private var updateDisposable: Disposable? = null
-
-    fun build(lifecycleOwner: LifecycleOwner, textureView: TextureView, width: Int, height: Int) =
+    override fun build(
+        lifecycleOwner: LifecycleOwner,
+        textureView: TextureView,
+        width: Int,
+        height: Int
+    ) =
         apply {
             preview = cameraBuilder.getPreview(textureView, width, height)
             processor = cameraBuilder.getImageProcessor()
@@ -37,31 +29,17 @@ class Camera2Source(private val config: ScannerConfig, displaySize: Size) {
             CameraX.bindToLifecycle(lifecycleOwner, preview, processor?.imageAnalysis)
         }
 
-    fun setConfigListener() = apply {
-        enableFlash(config.isFlashOn)
-
-        updateDisposable = updateSubject
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                {
-                    enableFlash(it.isFlashOn)
-                }, {
-
-                })
-    }
-
-    fun onImageProcessing(block: (imageConverter: CameraImageConverter) -> Unit) {
+    override fun onImageProcessing(block: (imageConverter: CameraImageConverter) -> Unit) {
         processor?.setImageProcessListener(block)
     }
 
-    //TODO move to base camerasource
-    fun clear() {
-        updateDisposable?.dispose()
-        CameraX.unbindAll()
+    override fun onConfigChange(config: ScannerConfig) {
+        super.onConfigChange(config)
+
+        preview?.enableTorch(config.isFlashOn)
     }
 
-    //TODO move to
-    fun enableFlash(isOn: Boolean) {
-        preview?.enableTorch(isOn)
+    override fun clear() {
+        CameraX.unbindAll()
     }
 }

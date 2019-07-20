@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
 
     private var disposable: Disposable? = null
 
-    private var isFlashOn = true
+    private var isFlashOn = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -5,23 +5,41 @@ import android.view.TextureView
 import androidx.lifecycle.LifecycleOwner
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraImageConverter
+import com.github.bobekos.simplebarcodescanner2.camera.base.CameraSource
 
-class Camera1Source(private val config: ScannerConfig, displaySize: Size) {
+class Camera1Source(config: ScannerConfig, displaySize: Size) : CameraSource(config) {
 
     private val cameraBuilder = Camera1SourceBuilder(config, displaySize).build()
 
     private var preview: Camera1Preview? = null
     private var processor: Camera1ImageProcessor? = null
 
-    fun build(lifecycleOwner: LifecycleOwner, textureView: TextureView, width: Int, height: Int) =
-        apply {
-            preview = cameraBuilder.getPreview(textureView, width, height)
-            processor = cameraBuilder.getImageProcessor()
+    override fun build(
+        lifecycleOwner: LifecycleOwner,
+        textureView: TextureView,
+        width: Int,
+        height: Int
+    ) = apply {
+        preview = cameraBuilder.getPreview(textureView, width, height)
+        processor = cameraBuilder.getImageProcessor()
 
-            preview?.bindToLifecycle(lifecycleOwner)
-        }
+        preview?.bindToLifecycle(lifecycleOwner)
+    }
 
-    fun onImageProcessing(block: (imageConverter: CameraImageConverter) -> Unit) {
+    override fun onImageProcessing(block: (imageConverter: CameraImageConverter) -> Unit) {
         processor?.setImageProcessListener(block)
+    }
+
+    override fun onConfigChange(config: ScannerConfig) {
+        super.onConfigChange(config)
+
+        //TODO
+        //preview?.enablteTorch(config.isFlashOn)
+    }
+
+    override fun clear() {
+        super.clear()
+
+        //TODO
     }
 }
