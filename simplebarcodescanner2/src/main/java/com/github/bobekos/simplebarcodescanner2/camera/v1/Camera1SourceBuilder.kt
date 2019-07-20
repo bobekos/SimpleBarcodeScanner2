@@ -44,7 +44,7 @@ class Camera1SourceBuilder(private val config: ScannerConfig, private val displa
     }
 
     override fun createImageAnalyzer(handler: Handler): Camera1ImageProcessor {
-        return Camera1ImageProcessor(camera, config.scannerResolution)
+        return Camera1ImageProcessor(camera, Size(720, 720))
     }
 
     private fun getFacing(facing: CameraFacing): Int {

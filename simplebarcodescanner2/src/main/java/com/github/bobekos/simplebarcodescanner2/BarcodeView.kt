@@ -116,7 +116,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
                     cameraSource
                         .build(this@BarcodeView, textureView, width, height)
-                            //.setConfigListener()
+                    //.setConfigListener()
 
                     processFrame(emitter)
                 }
@@ -135,8 +135,8 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     }
 
     private fun processFrame(emitter: ObservableEmitter<BarcodeResult>) {
-        cameraSource.onImageProcessing { image, rotation ->
-            barcodeScanner.processImage(image, rotation,
+        cameraSource.onImageProcessing { imageConverter ->
+            barcodeScanner.processImage(imageConverter,
                 barcodeResultListener = { barcodeResult ->
                     emitter.isNotDisposed { onNext(barcodeResult) }
                 },

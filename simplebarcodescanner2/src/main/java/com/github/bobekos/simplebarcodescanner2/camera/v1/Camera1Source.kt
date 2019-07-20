@@ -4,6 +4,7 @@ import android.util.Size
 import android.view.TextureView
 import androidx.lifecycle.LifecycleOwner
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
+import com.github.bobekos.simplebarcodescanner2.camera.base.CameraImageConverter
 
 class Camera1Source(private val config: ScannerConfig, displaySize: Size) {
 
@@ -20,7 +21,7 @@ class Camera1Source(private val config: ScannerConfig, displaySize: Size) {
             preview?.bindToLifecycle(lifecycleOwner)
         }
 
-    fun onImageProcessing(block: (byteArray: ByteArray, imageRotation: Int) -> Unit) {
+    fun onImageProcessing(block: (imageConverter: CameraImageConverter) -> Unit) {
         processor?.setImageProcessListener(block)
     }
 }
