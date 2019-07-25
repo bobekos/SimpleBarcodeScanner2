@@ -17,7 +17,8 @@ class Camera1ImageProcessor(camera: Camera, handler: Handler, previewSize: Size,
                             data,
                             previewSize,
                             getVisionRotation(rotation)
-                        )
+                        ),
+                        previewSize
                     )
                 }
             }

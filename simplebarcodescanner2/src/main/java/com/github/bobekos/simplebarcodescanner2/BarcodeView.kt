@@ -54,7 +54,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
     private val cameraSource: CameraSource by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Camera1Source(config, getDisplaySize())
+            Camera2Source(config, getDisplaySize())
         } else {
             Camera1Source(config, getDisplaySize())
         }
@@ -117,7 +117,6 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
                     overlayBuilder
                         .createOverlayView(this@BarcodeView, config.barcodeOverlay)
-                        .calculateOverlayScale(width, height, config.scannerResolution)
                         .checkOrientationAndFacing(context, config.lensFacing)
 
                     cameraSource
@@ -141,7 +140,9 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     }
 
     private fun processFrame(emitter: ObservableEmitter<BarcodeResult>) {
-        cameraSource.onImageProcessing { imageConverter ->
+        cameraSource.onImageProcessing { imageConverter, imageSize ->
+            overlayBuilder.calculateOverlayScale(width, height, imageSize)
+
             barcodeScanner.processImage(imageConverter,
                 barcodeResultListener = { barcodeResult ->
                     emitter.isNotDisposed { onNext(barcodeResult) }

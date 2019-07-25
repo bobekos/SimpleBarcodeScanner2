@@ -29,7 +29,7 @@ class Camera2Source(config: ScannerConfig, displaySize: Size) : CameraSource(con
             CameraX.bindToLifecycle(lifecycleOwner, preview, processor?.imageAnalysis)
         }
 
-    override fun onImageProcessing(block: (imageConverter: CameraImageConverter) -> Unit) {
+    override fun onImageProcessing(block: (imageConverter: CameraImageConverter, imageSize: Size) -> Unit) {
         processor?.setImageProcessListener(block)
     }
 

@@ -24,7 +24,10 @@ class Camera2ImageProcessor(handler: Handler, facing: CameraX.LensFacing, scanne
     init {
         imageAnalysis.setAnalyzer { frame, rotationDegrees ->
             frame?.image?.let {
-                imageProcessCallback?.invoke(Camera2Image(it, getVisionRotation(rotationDegrees)))
+                imageProcessCallback?.invoke(
+                    Camera2Image(it, getVisionRotation(rotationDegrees)),
+                    Size(it.width, it.height)
+                )
             }
         }
     }

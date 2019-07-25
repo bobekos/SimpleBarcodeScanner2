@@ -1,5 +1,6 @@
 package com.github.bobekos.simplebarcodescanner2.camera.base
 
+import android.util.Size
 import android.view.TextureView
 import androidx.lifecycle.LifecycleOwner
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
@@ -26,7 +27,7 @@ abstract class CameraSource(private val config: ScannerConfig) {
         height: Int
     ): CameraSource
 
-    abstract fun onImageProcessing(block: (imageConverter: CameraImageConverter) -> Unit)
+    abstract fun onImageProcessing(block: (imageConverter: CameraImageConverter, imageSize: Size) -> Unit)
 
     open fun clear() {
         updateDisposable?.dispose()

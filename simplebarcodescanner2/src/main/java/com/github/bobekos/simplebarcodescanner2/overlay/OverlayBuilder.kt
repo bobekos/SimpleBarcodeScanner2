@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
 import com.github.bobekos.simplebarcodescanner2.utils.fdiv
+import kotlin.math.max
+import kotlin.math.min
 
 class OverlayBuilder {
 
@@ -29,20 +31,28 @@ class OverlayBuilder {
         }
 
         root.removeView(overlay as View)
-        root.addView(overlay, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        root.addView(
+            overlay,
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT
+        )
     }
 
-    fun calculateOverlayScale(width: Int, height: Int, scannerResolution: Size) = apply {
-        textureWidth = width
-        textureHeight = height
+    fun calculateOverlayScale(width: Int, height: Int, imageSize: Size) = apply {
+        if (textureHeight == 0 && textureWidth == 0) {
 
-        val max = Math.max(scannerResolution.width, scannerResolution.height)
-        val min = Math.min(scannerResolution.width, scannerResolution.height)
+            textureWidth = width
+            textureHeight = height
 
-        xScaleFactorP = textureWidth.fdiv(min)
-        xScaleFactorL = textureWidth.fdiv(max)
-        yScaleFactorP = textureHeight.fdiv(max)
-        yScaleFactorL = textureHeight.fdiv(min)
+            val max = max(imageSize.width, imageSize.height)
+            val min = min(imageSize.width, imageSize.height)
+
+            xScaleFactorP = textureWidth.fdiv(min)
+            xScaleFactorL = textureWidth.fdiv(max)
+            yScaleFactorP = textureHeight.fdiv(max)
+            yScaleFactorL = textureHeight.fdiv(min)
+
+        }
     }
 
     fun checkOrientationAndFacing(ctx: Context, facing: CameraFacing) {

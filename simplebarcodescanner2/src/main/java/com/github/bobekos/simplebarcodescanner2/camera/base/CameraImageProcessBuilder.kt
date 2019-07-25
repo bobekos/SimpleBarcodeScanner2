@@ -1,13 +1,14 @@
 package com.github.bobekos.simplebarcodescanner2.camera.base
 
+import android.util.Size
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 
 open class CameraImageProcessBuilder {
 
-    var imageProcessCallback: ((CameraImageConverter) -> Unit)? = null
+    var imageProcessCallback: ((CameraImageConverter, Size) -> Unit)? = null
         private set
 
-    fun setImageProcessListener(block: (image: CameraImageConverter) -> Unit) {
+    fun setImageProcessListener(block: (image: CameraImageConverter, imageSize: Size) -> Unit) {
         imageProcessCallback = block
     }
 
