@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Point
 import android.graphics.SurfaceTexture
+import android.os.Build
 import android.util.AttributeSet
 import android.util.Size
 import android.view.TextureView
@@ -12,6 +13,8 @@ import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import com.github.bobekos.simplebarcodescanner2.camera.base.CameraSource
+import com.github.bobekos.simplebarcodescanner2.camera.v1.Camera1Source
 import com.github.bobekos.simplebarcodescanner2.camera.v2.Camera2Source
 import com.github.bobekos.simplebarcodescanner2.overlay.BarcodeOverlay
 import com.github.bobekos.simplebarcodescanner2.overlay.BarcodeRectOverlay
@@ -49,8 +52,12 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     private val overlayBuilder = OverlayBuilder()
     private val barcodeScanner = BarcodeScanner(config)
 
-    private val cameraSource by lazy {
-        Camera2Source(config, getDisplaySize())
+    private val cameraSource: CameraSource by lazy {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Camera2Source(config, getDisplaySize())
+        } else {
+            Camera1Source(config, getDisplaySize())
+        }
     }
 
     override fun getLifecycle(): Lifecycle = lifecycleRegistry
@@ -76,7 +83,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     fun enableFlash(isOn: Boolean) = apply {
         config.isFlashOn = isOn
 
-        Camera2Source.updateByConfig(config)
+        CameraSource.updateByConfig(config)
     }
 
     fun getObservable(): Observable<FirebaseVisionBarcode> {
@@ -110,7 +117,6 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
                     overlayBuilder
                         .createOverlayView(this@BarcodeView, config.barcodeOverlay)
-                        .calculateOverlayScale(width, height, config.scannerResolution)
                         .checkOrientationAndFacing(context, config.lensFacing)
 
                     cameraSource
@@ -134,8 +140,10 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     }
 
     private fun processFrame(emitter: ObservableEmitter<BarcodeResult>) {
-        cameraSource.onImageProcessing { image, rotation ->
-            barcodeScanner.processImage(image, rotation,
+        cameraSource.onImageProcessing { imageConverter, imageSize ->
+            overlayBuilder.calculateOverlayScale(width, height, imageSize)
+
+            barcodeScanner.processImage(imageConverter,
                 barcodeResultListener = { barcodeResult ->
                     emitter.isNotDisposed { onNext(barcodeResult) }
                 },

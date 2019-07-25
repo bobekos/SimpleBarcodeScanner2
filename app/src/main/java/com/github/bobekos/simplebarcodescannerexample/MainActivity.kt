@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
 
     private var disposable: Disposable? = null
 
-    private var isFlashOn = true
+    private var isFlashOn = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         disposable = barcodeView
             .setFacing(CameraFacing.BACK)
+            .drawOverlay()
             .enableFlash(isFlashOn)
             .getObservable()
             .observeOn(AndroidSchedulers.mainThread())

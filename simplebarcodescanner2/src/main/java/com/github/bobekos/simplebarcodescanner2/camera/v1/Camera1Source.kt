@@ -1,33 +1,30 @@
-package com.github.bobekos.simplebarcodescanner2.camera.v2
+package com.github.bobekos.simplebarcodescanner2.camera.v1
 
 import android.util.Size
 import android.view.TextureView
-import androidx.camera.core.CameraX
-import androidx.camera.core.Preview
 import androidx.lifecycle.LifecycleOwner
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraImageConverter
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraSource
 
-class Camera2Source(config: ScannerConfig, displaySize: Size) : CameraSource(config) {
+class Camera1Source(config: ScannerConfig, displaySize: Size) : CameraSource(config) {
 
-    private val cameraBuilder = Camera2SourceBuilder(config, displaySize)
+    private val cameraBuilder = Camera1SourceBuilder(config, displaySize).build()
 
-    private var preview: Preview? = null
-    private var processor: Camera2ImageProcessor? = null
+    private var preview: Camera1Preview? = null
+    private var processor: Camera1ImageProcessor? = null
 
     override fun build(
         lifecycleOwner: LifecycleOwner,
         textureView: TextureView,
         width: Int,
         height: Int
-    ) =
-        apply {
-            preview = cameraBuilder.getPreview(textureView, width, height)
-            processor = cameraBuilder.getImageProcessor()
+    ) = apply {
+        preview = cameraBuilder.getPreview(textureView, width, height)
+        processor = cameraBuilder.getImageProcessor()
 
-            CameraX.bindToLifecycle(lifecycleOwner, preview, processor?.imageAnalysis)
-        }
+        preview?.bindToLifecycle(lifecycleOwner)
+    }
 
     override fun onImageProcessing(block: (imageConverter: CameraImageConverter, imageSize: Size) -> Unit) {
         processor?.setImageProcessListener(block)
@@ -36,10 +33,13 @@ class Camera2Source(config: ScannerConfig, displaySize: Size) : CameraSource(con
     override fun onConfigChange(config: ScannerConfig) {
         super.onConfigChange(config)
 
-        preview?.enableTorch(config.isFlashOn)
+        //TODO
+        //preview?.enablteTorch(config.isFlashOn)
     }
 
     override fun clear() {
-        CameraX.unbindAll()
+        super.clear()
+
+        //TODO
     }
 }
