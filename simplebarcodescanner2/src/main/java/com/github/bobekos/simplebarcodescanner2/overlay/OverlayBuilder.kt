@@ -40,7 +40,6 @@ class OverlayBuilder {
 
     fun calculateOverlayScale(width: Int, height: Int, imageSize: Size) = apply {
         if (textureHeight == 0 && textureWidth == 0) {
-
             textureWidth = width
             textureHeight = height
 
@@ -51,7 +50,6 @@ class OverlayBuilder {
             xScaleFactorL = textureWidth.fdiv(max)
             yScaleFactorP = textureHeight.fdiv(max)
             yScaleFactorL = textureHeight.fdiv(min)
-
         }
     }
 

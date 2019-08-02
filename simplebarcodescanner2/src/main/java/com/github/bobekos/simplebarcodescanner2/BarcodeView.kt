@@ -123,12 +123,12 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                         .build(this@BarcodeView, textureView, width, height)
                         .setConfigListener()
 
-                    processFrame(emitter)
+                    processFrame(width, height, emitter)
                 }
             }
 
             if (textureView.isAvailable) {
-                processFrame(emitter)
+                processFrame(textureView.width, textureView.height, emitter)
             }
         }.distinctUntilChanged { result1, result2 ->
             result1.rawValue == result2.rawValue
@@ -139,7 +139,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
         }
     }
 
-    private fun processFrame(emitter: ObservableEmitter<BarcodeResult>) {
+    private fun processFrame(width: Int, height: Int, emitter: ObservableEmitter<BarcodeResult>) {
         cameraSource.onImageProcessing { imageConverter, imageSize ->
             overlayBuilder.calculateOverlayScale(width, height, imageSize)
 
