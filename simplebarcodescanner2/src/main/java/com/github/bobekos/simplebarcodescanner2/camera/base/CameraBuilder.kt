@@ -1,12 +1,14 @@
 package com.github.bobekos.simplebarcodescanner2.camera.base
 
 import android.graphics.Matrix
+import android.graphics.RectF
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Size
 import android.view.TextureView
 import com.github.bobekos.simplebarcodescanner2.utils.DisplayRotation
 import com.github.bobekos.simplebarcodescanner2.utils.fdiv
+import kotlin.math.max
 
 abstract class CameraBuilder<T, X> {
 
@@ -37,29 +39,26 @@ abstract class CameraBuilder<T, X> {
         parentViewWidth: Int,
         parentViewHeight: Int
     ) {
-        val previewWidth = cameraPreviewSize.height
-        val previewHeight = cameraPreviewSize.width
-
-        val surfaceWidthRatio = parentViewWidth.fdiv(previewWidth)
-        val surfaceHeightRatio = parentViewHeight.fdiv(previewHeight)
-
-        val surfaceScaleX: Float
-        val surfaceScaleY: Float
-
-        if (surfaceWidthRatio > surfaceHeightRatio) {
-            surfaceScaleX = 1f
-            surfaceScaleY = (previewHeight * surfaceWidthRatio).div(parentViewHeight)
-        } else {
-            surfaceScaleX = (previewWidth * surfaceHeightRatio).div(previewWidth)
-            surfaceScaleY = 1f
-        }
-
-        val centerX = parentViewWidth.fdiv(2)
-        val centerY = parentViewHeight.fdiv(2)
-
         val matrix = Matrix()
-        matrix.postRotate(-displayRotation.getSurfaceRotation(), centerX, centerY)
-        matrix.preScale(surfaceScaleX, surfaceScaleY, centerX, centerY)
+
+        val textureRectF = RectF(0f, 0f, parentViewWidth.toFloat(), parentViewHeight.toFloat())
+        val previewRectF =
+            RectF(0f, 0f, cameraPreviewSize.height.toFloat(), cameraPreviewSize.width.toFloat())
+
+        val centerX = textureRectF.centerX()
+        val centerY = textureRectF.centerY()
+
+        if (displayRotation.isLandscape()) {
+            previewRectF.offset(centerX - previewRectF.centerX(), centerY - previewRectF.centerY())
+            matrix.setRectToRect(textureRectF, previewRectF, Matrix.ScaleToFit.FILL)
+
+            val scale = max(
+                parentViewWidth.fdiv(cameraPreviewSize.width),
+                parentViewHeight.fdiv(cameraPreviewSize.height)
+            )
+            matrix.postScale(scale, scale, centerX, centerY)
+            matrix.postRotate(90f * (displayRotation.getDisplayRotation() - 2), centerX, centerY)
+        }
 
         textureView.setTransform(matrix)
     }
