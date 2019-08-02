@@ -6,7 +6,7 @@ android {
 
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 14
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -25,7 +25,7 @@ android {
 }
 
 dependencies {
-    def firebase_ml_version = "21.0.0"
+    def firebase_ml_version = "22.0.0"
     def camerax_version = "1.0.0-alpha03"
 
     def rxjava_version = "2.2.8"
