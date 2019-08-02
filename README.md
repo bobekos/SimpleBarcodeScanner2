@@ -1,1 +1,3 @@
 # SimpleBarcodeScanner2
+
+in progress...
