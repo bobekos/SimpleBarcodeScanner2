@@ -6,7 +6,6 @@ import android.graphics.Point
 import android.graphics.SurfaceTexture
 import android.os.Build
 import android.util.AttributeSet
-import android.util.Size
 import android.view.TextureView
 import android.view.WindowManager
 import android.widget.FrameLayout
@@ -22,6 +21,7 @@ import com.github.bobekos.simplebarcodescanner2.overlay.OverlayBuilder
 import com.github.bobekos.simplebarcodescanner2.scanner.BarcodeResult
 import com.github.bobekos.simplebarcodescanner2.scanner.BarcodeScanner
 import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
+import com.github.bobekos.simplebarcodescanner2.utils.Size
 import com.github.bobekos.simplebarcodescanner2.utils.isNotDisposed
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import io.reactivex.Observable
@@ -163,7 +163,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     private fun getDisplaySize(): Size {
         val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val p = Point()
-        wm.defaultDisplay.getRealSize(p)
+        wm.defaultDisplay.getSize(p)
 
         return Size(p.x, p.y)
     }

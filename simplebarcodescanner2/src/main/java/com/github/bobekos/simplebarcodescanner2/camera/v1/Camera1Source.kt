@@ -1,11 +1,11 @@
 package com.github.bobekos.simplebarcodescanner2.camera.v1
 
-import android.util.Size
 import android.view.TextureView
 import androidx.lifecycle.LifecycleOwner
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraImageConverter
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraSource
+import com.github.bobekos.simplebarcodescanner2.utils.Size
 
 class Camera1Source(config: ScannerConfig, displaySize: Size) : CameraSource(config) {
 

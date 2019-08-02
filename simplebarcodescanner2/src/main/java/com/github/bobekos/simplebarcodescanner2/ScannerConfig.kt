@@ -1,8 +1,9 @@
 package com.github.bobekos.simplebarcodescanner2
 
-import android.util.Size
+
 import com.github.bobekos.simplebarcodescanner2.overlay.BarcodeOverlay
 import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
+import com.github.bobekos.simplebarcodescanner2.utils.Size
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 
 data class ScannerConfig(

@@ -1,9 +1,9 @@
 package com.github.bobekos.simplebarcodescanner2.camera.base
 
-import android.util.Size
 import android.view.TextureView
 import androidx.lifecycle.LifecycleOwner
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
+import com.github.bobekos.simplebarcodescanner2.utils.Size
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject

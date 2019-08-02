@@ -1,16 +1,13 @@
 package com.github.bobekos.simplebarcodescanner2.camera.v1
 
-import android.graphics.Matrix
 import android.hardware.Camera
 import android.os.Handler
-import android.util.Size
 import android.view.TextureView
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraBuilder
 import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
-import com.github.bobekos.simplebarcodescanner2.utils.fdiv
+import com.github.bobekos.simplebarcodescanner2.utils.Size
 import com.google.android.gms.vision.CameraSource
-import kotlin.math.abs
 
 class Camera1SourceBuilder(private val config: ScannerConfig, private val displaySize: Size) :
     CameraBuilder<Camera1Preview, Camera1ImageProcessor>() {

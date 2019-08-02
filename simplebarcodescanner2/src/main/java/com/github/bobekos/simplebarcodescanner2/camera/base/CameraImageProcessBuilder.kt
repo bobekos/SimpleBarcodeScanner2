@@ -1,6 +1,6 @@
 package com.github.bobekos.simplebarcodescanner2.camera.base
 
-import android.util.Size
+import com.github.bobekos.simplebarcodescanner2.utils.Size
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 
 open class CameraImageProcessBuilder {

@@ -1,11 +1,11 @@
 package com.github.bobekos.simplebarcodescanner2.camera.v1
 
 import android.hardware.Camera
-import android.util.Size
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
+import com.github.bobekos.simplebarcodescanner2.utils.Size
 import java.lang.Math.abs
 
 class Camera1Preview(val camera: Camera, displaySize: Size) : LifecycleObserver {

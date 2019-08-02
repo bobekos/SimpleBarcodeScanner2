@@ -2,8 +2,8 @@ package com.github.bobekos.simplebarcodescanner2.camera.v1
 
 import android.hardware.Camera
 import android.os.Handler
-import android.util.Size
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraImageProcessBuilder
+import com.github.bobekos.simplebarcodescanner2.utils.Size
 
 class Camera1ImageProcessor(camera: Camera, handler: Handler, previewSize: Size, rotation: Int) :
     CameraImageProcessBuilder() {

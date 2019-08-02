@@ -1,6 +1,7 @@
 package com.github.bobekos.simplebarcodescanner2.camera.v2
 
-import android.util.Size
+import android.annotation.TargetApi
+import android.os.Build
 import android.view.TextureView
 import androidx.camera.core.CameraX
 import androidx.camera.core.Preview
@@ -8,7 +9,9 @@ import androidx.lifecycle.LifecycleOwner
 import com.github.bobekos.simplebarcodescanner2.ScannerConfig
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraImageConverter
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraSource
+import com.github.bobekos.simplebarcodescanner2.utils.Size
 
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 class Camera2Source(config: ScannerConfig, displaySize: Size) : CameraSource(config) {
 
     private val cameraBuilder = Camera2SourceBuilder(config, displaySize)

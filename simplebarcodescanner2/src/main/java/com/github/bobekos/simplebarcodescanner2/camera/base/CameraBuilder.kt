@@ -4,9 +4,9 @@ import android.graphics.Matrix
 import android.graphics.RectF
 import android.os.Handler
 import android.os.HandlerThread
-import android.util.Size
 import android.view.TextureView
 import com.github.bobekos.simplebarcodescanner2.utils.DisplayRotation
+import com.github.bobekos.simplebarcodescanner2.utils.Size
 import com.github.bobekos.simplebarcodescanner2.utils.fdiv
 import kotlin.math.max
 

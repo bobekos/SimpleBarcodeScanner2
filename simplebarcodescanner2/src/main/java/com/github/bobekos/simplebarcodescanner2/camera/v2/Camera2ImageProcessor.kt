@@ -1,18 +1,21 @@
 package com.github.bobekos.simplebarcodescanner2.camera.v2
 
+import android.annotation.TargetApi
+import android.os.Build
 import android.os.Handler
 import android.util.Rational
-import android.util.Size
 import androidx.camera.core.CameraX
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageAnalysisConfig
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraImageProcessBuilder
+import com.github.bobekos.simplebarcodescanner2.utils.Size
 
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 class Camera2ImageProcessor(handler: Handler, facing: CameraX.LensFacing, scannerResolution: Size) :
     CameraImageProcessBuilder() {
 
     private val config = ImageAnalysisConfig.Builder()
-        .setTargetResolution(scannerResolution)
+        .setTargetResolution(scannerResolution.getCamera2Size())
         .setTargetAspectRatio(Rational(scannerResolution.width, scannerResolution.height))
         .setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
         .setLensFacing(facing)

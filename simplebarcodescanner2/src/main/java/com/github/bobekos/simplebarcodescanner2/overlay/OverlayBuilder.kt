@@ -3,11 +3,11 @@ package com.github.bobekos.simplebarcodescanner2.overlay
 import android.content.Context
 import android.content.res.Configuration
 import android.graphics.RectF
-import android.util.Size
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
+import com.github.bobekos.simplebarcodescanner2.utils.Size
 import com.github.bobekos.simplebarcodescanner2.utils.fdiv
 import kotlin.math.max
 import kotlin.math.min

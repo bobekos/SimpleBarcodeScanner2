@@ -1,7 +1,7 @@
 package com.github.bobekos.simplebarcodescanner2.camera.v1
 
-import android.util.Size
 import com.github.bobekos.simplebarcodescanner2.camera.base.CameraImageConverter
+import com.github.bobekos.simplebarcodescanner2.utils.Size
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 
