@@ -19,13 +19,6 @@ class DisplayRotation(private val display: Display?) {
         }
     }
 
-    fun isPortrait(): Boolean {
-        return when (display?.rotation) {
-            Surface.ROTATION_0, Surface.ROTATION_180 -> true
-            else -> false
-        }
-    }
-
     fun isLandscape(): Boolean {
         return when (display?.rotation) {
             Surface.ROTATION_90, Surface.ROTATION_270 -> true

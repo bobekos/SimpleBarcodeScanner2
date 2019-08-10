@@ -2,12 +2,10 @@ package com.github.bobekos.simplebarcodescanner2
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.Point
 import android.graphics.SurfaceTexture
 import android.os.Build
 import android.util.AttributeSet
 import android.view.TextureView
-import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -21,7 +19,7 @@ import com.github.bobekos.simplebarcodescanner2.overlay.OverlayBuilder
 import com.github.bobekos.simplebarcodescanner2.scanner.BarcodeResult
 import com.github.bobekos.simplebarcodescanner2.scanner.BarcodeScanner
 import com.github.bobekos.simplebarcodescanner2.utils.CameraFacing
-import com.github.bobekos.simplebarcodescanner2.utils.Size
+import com.github.bobekos.simplebarcodescanner2.utils.getDisplaySize
 import com.github.bobekos.simplebarcodescanner2.utils.isNotDisposed
 import com.google.firebase.ml.vision.barcode.FirebaseVisionBarcode
 import io.reactivex.Observable
@@ -54,9 +52,9 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
     private val cameraSource: CameraSource by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Camera2Source(config, getDisplaySize())
+            Camera2Source(config, context.getDisplaySize())
         } else {
-            Camera1Source(config, getDisplaySize())
+            Camera1Source(config, context.getDisplaySize())
         }
     }
 
@@ -158,13 +156,5 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                 }
             )
         }
-    }
-
-    private fun getDisplaySize(): Size {
-        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val p = Point()
-        wm.defaultDisplay.getSize(p)
-
-        return Size(p.x, p.y)
     }
 }

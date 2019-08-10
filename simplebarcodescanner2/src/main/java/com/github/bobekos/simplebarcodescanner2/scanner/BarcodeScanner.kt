@@ -25,7 +25,6 @@ class BarcodeScanner(config: ScannerConfig) {
         barcodeResultListener: (barcodeResult: BarcodeResult) -> Unit,
         overlayListener: (rectF: RectF, rawValue: String) -> Unit
     ) {
-
         if (isProcessing.compareAndSet(false, true)) {
             return
         }

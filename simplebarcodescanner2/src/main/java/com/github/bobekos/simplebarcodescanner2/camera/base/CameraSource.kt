@@ -46,7 +46,6 @@ abstract class CameraSource(private val config: ScannerConfig) {
                     onConfigChange(config)
                 },
                 {
-                    //TODO
                 })
 
         return this
