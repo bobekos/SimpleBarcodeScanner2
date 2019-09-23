@@ -53,6 +53,10 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     private val barcodeScanner = BarcodeScanner(config)
 
     private val cameraSource: CameraSource by lazy {
+        if (config.isDefaultScannerResolution) {
+            config.scannerResolution = getDisplaySize()
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Camera2Source(config, getDisplaySize())
         } else {
@@ -84,6 +88,11 @@ class BarcodeView : FrameLayout, LifecycleOwner {
         config.isFlashOn = isOn
 
         CameraSource.updateByConfig(config)
+    }
+
+    fun setScannerResolution(width: Int, height: Int) {
+        config.isDefaultScannerResolution = false
+        config.scannerResolution = Size(width, height)
     }
 
     fun getObservable(): Observable<FirebaseVisionBarcode> {
