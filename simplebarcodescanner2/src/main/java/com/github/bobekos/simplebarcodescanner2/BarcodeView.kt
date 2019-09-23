@@ -53,7 +53,10 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
     private val config = ScannerConfig()
     private val overlayBuilder = OverlayBuilder()
-    private val barcodeScanner = BarcodeScanner(config)
+
+    private val barcodeScanner: BarcodeScanner by lazy {
+        BarcodeScanner(config)
+    }
 
     private val cameraSource: CameraSource by lazy {
         if (config.isDefaultScannerResolution) {
@@ -93,7 +96,11 @@ class BarcodeView : FrameLayout, LifecycleOwner {
         CameraSource.updateByConfig(config)
     }
 
-    fun setScannerResolution(width: Int, height: Int) {
+    fun setBarcodeFormats(vararg format: Int) = apply {
+        config.barcodeFormat = format.toList()
+    }
+
+    fun setScannerResolution(width: Int, height: Int) = apply {
         config.isDefaultScannerResolution = false
         config.scannerResolution = Size(width, height)
     }
