@@ -101,7 +101,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                 }
 
                 override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
-                    lifecycleRegistry.markState(Lifecycle.State.DESTROYED)
+                    lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
                     cameraSource.clear()
 
                     return true
@@ -112,8 +112,8 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                     width: Int,
                     height: Int
                 ) {
-                    lifecycleRegistry.markState(Lifecycle.State.CREATED)
-                    lifecycleRegistry.markState(Lifecycle.State.STARTED)
+                    lifecycleRegistry.currentState = Lifecycle.State.CREATED
+                    lifecycleRegistry.currentState = Lifecycle.State.STARTED
 
                     overlayBuilder
                         .createOverlayView(this@BarcodeView, config.barcodeOverlay)
