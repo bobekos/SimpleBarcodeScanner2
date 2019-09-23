@@ -22,19 +22,23 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    def firebase_ml_version = "22.0.0"
-    def camerax_version = "1.0.0-alpha03"
+    def firebase_ml_version = "23.0.0"
+    def camerax_version = "1.0.0-alpha05"
 
     def rxjava_version = "2.2.8"
     def rxandroid_version = "2.1.1"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.core:core-ktx:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.1.0'
 
     api "androidx.camera:camera-core:${camerax_version}"
     api "androidx.camera:camera-camera2:${camerax_version}"
