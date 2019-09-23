@@ -1,6 +1,8 @@
 package com.github.bobekos.simplebarcodescanner2
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Point
 import android.graphics.SurfaceTexture
@@ -9,6 +11,7 @@ import android.util.AttributeSet
 import android.view.TextureView
 import android.view.WindowManager
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -38,9 +41,9 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context,
-        attrs,
-        defStyleAttr
+            context,
+            attrs,
+            defStyleAttr
     ) {
         init()
     }
@@ -67,7 +70,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     override fun getLifecycle(): Lifecycle = lifecycleRegistry
 
     private fun init() {
-        setBackgroundColor(Color.RED)
+        setBackgroundColor(Color.BLACK)
 
         lifecycleRegistry = LifecycleRegistry(this)
 
@@ -97,13 +100,20 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
     fun getObservable(): Observable<FirebaseVisionBarcode> {
         return Observable.create<BarcodeResult> { emitter ->
+            if (!hasPermission()) {
+                emitter.isNotDisposed {
+                    onError(SecurityException("Permission denied (missing Camera permission)"))
+                }
+
+                return@create
+            }
+
             textureView.surfaceTextureListener = object : TextureView.SurfaceTextureListener {
                 override fun onSurfaceTextureSizeChanged(
-                    surface: SurfaceTexture?,
-                    width: Int,
-                    height: Int
+                        surface: SurfaceTexture?,
+                        width: Int,
+                        height: Int
                 ) {
-                    //TODO
                 }
 
                 override fun onSurfaceTextureUpdated(surface: SurfaceTexture?) {
@@ -118,20 +128,20 @@ class BarcodeView : FrameLayout, LifecycleOwner {
                 }
 
                 override fun onSurfaceTextureAvailable(
-                    surface: SurfaceTexture?,
-                    width: Int,
-                    height: Int
+                        surface: SurfaceTexture?,
+                        width: Int,
+                        height: Int
                 ) {
                     lifecycleRegistry.currentState = Lifecycle.State.CREATED
                     lifecycleRegistry.currentState = Lifecycle.State.STARTED
 
                     overlayBuilder
-                        .createOverlayView(this@BarcodeView, config.barcodeOverlay)
-                        .checkOrientationAndFacing(context, config.lensFacing)
+                            .createOverlayView(this@BarcodeView, config.barcodeOverlay)
+                            .checkOrientationAndFacing(context, config.lensFacing)
 
                     cameraSource
-                        .build(this@BarcodeView, textureView, width, height)
-                        .setConfigListener()
+                            .build(this@BarcodeView, textureView, width, height)
+                            .setConfigListener()
 
                     processFrame(width, height, emitter)
                 }
@@ -154,18 +164,18 @@ class BarcodeView : FrameLayout, LifecycleOwner {
             overlayBuilder.calculateOverlayScale(width, height, imageSize)
 
             barcodeScanner.processImage(imageConverter,
-                barcodeResultListener = { barcodeResult ->
-                    emitter.isNotDisposed { onNext(barcodeResult) }
-                },
-                overlayListener = { rectF, rawValue ->
-                    emitter.isNotDisposed {
-                        overlayBuilder.onBarcodeDetected(
-                            rectF,
-                            rawValue,
-                            config.barcodeOverlay
-                        )
+                    barcodeResultListener = { barcodeResult ->
+                        emitter.isNotDisposed { onNext(barcodeResult) }
+                    },
+                    overlayListener = { rectF, rawValue ->
+                        emitter.isNotDisposed {
+                            overlayBuilder.onBarcodeDetected(
+                                    rectF,
+                                    rawValue,
+                                    config.barcodeOverlay
+                            )
+                        }
                     }
-                }
             )
         }
     }
@@ -176,5 +186,10 @@ class BarcodeView : FrameLayout, LifecycleOwner {
         wm.defaultDisplay.getSize(p)
 
         return Size(p.x, p.y)
+    }
+
+    private fun hasPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED
     }
 }
