@@ -12,5 +12,7 @@ data class ScannerConfig(
         var barcodeFormat: List<Int> = arrayListOf(FirebaseVisionBarcode.FORMAT_ALL_FORMATS),
         var lensFacing: CameraFacing = CameraFacing.BACK,
         var barcodeOverlay: BarcodeOverlay? = null,
-        var isFlashOn: Boolean = false
+        var isFlashOn: Boolean = false,
+        var playBeepSound: Boolean = false,
+        var vibrate: Long = 0L
 )

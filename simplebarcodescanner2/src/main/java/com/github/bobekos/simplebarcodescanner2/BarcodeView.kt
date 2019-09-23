@@ -55,7 +55,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     private val overlayBuilder = OverlayBuilder()
 
     private val barcodeScanner: BarcodeScanner by lazy {
-        BarcodeScanner(config)
+        BarcodeScanner(context, config)
     }
 
     private val cameraSource: CameraSource by lazy {
@@ -103,6 +103,14 @@ class BarcodeView : FrameLayout, LifecycleOwner {
     fun setScannerResolution(width: Int, height: Int) = apply {
         config.isDefaultScannerResolution = false
         config.scannerResolution = Size(width, height)
+    }
+
+    fun playBeepSound(isEnabled: Boolean = true) = apply {
+        config.playBeepSound = isEnabled
+    }
+
+    fun setVibration(duration: Long = 500L) = apply {
+        config.vibrate = duration
     }
 
     fun getObservable(): Observable<FirebaseVisionBarcode> {
@@ -163,6 +171,8 @@ class BarcodeView : FrameLayout, LifecycleOwner {
             it is BarcodeResult.Data
         }.map {
             (it as BarcodeResult.Data).barcode
+        }.doOnNext {
+            barcodeScanner.onBarcodeDetection()
         }
     }
 
