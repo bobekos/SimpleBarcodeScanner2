@@ -72,7 +72,7 @@ class OverlayBuilder {
     }
 
     private fun translateX(x: Float): Float {
-        var result = (x * if (isPortrait) xScaleFactorP else xScaleFactorL)
+        var result = x * if (isPortrait) xScaleFactorP else xScaleFactorL
 
         if (cameraFacing == CameraFacing.FRONT) {
             result = textureWidth - result
@@ -82,6 +82,6 @@ class OverlayBuilder {
     }
 
     private fun translateY(y: Float): Float {
-        return (y * if (isPortrait) yScaleFactorP else yScaleFactorL)
+        return y * if (isPortrait) yScaleFactorP else yScaleFactorL
     }
 }

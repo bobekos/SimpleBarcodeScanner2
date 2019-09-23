@@ -18,6 +18,7 @@ class BarcodeScanner(config: ScannerConfig) {
     private val detector = FirebaseVision.getInstance()
         .getVisionBarcodeDetector(detectorOptions)
 
+    private val isRunning = AtomicBoolean(true)
     private val isProcessing = AtomicBoolean(false)
 
     fun processImage(
@@ -25,6 +26,9 @@ class BarcodeScanner(config: ScannerConfig) {
         barcodeResultListener: (barcodeResult: BarcodeResult) -> Unit,
         overlayListener: (rectF: RectF, rawValue: String) -> Unit
     ) {
+        if (!isRunning.get()) {
+            return
+        }
 
         if (isProcessing.compareAndSet(false, true)) {
             return
@@ -46,5 +50,10 @@ class BarcodeScanner(config: ScannerConfig) {
 
                 isProcessing.set(false)
             }
+    }
+
+    fun close() {
+        isRunning.set(false)
+        detector.close()
     }
 }

@@ -102,6 +102,7 @@ class BarcodeView : FrameLayout, LifecycleOwner {
 
                 override fun onSurfaceTextureDestroyed(surface: SurfaceTexture?): Boolean {
                     lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
+                    barcodeScanner.close()
                     cameraSource.clear()
 
                     return true
