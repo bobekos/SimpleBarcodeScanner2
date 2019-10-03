@@ -12,7 +12,7 @@ class BarcodeRectOverlay : View, BarcodeOverlay {
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
-    private lateinit var rect: RectF
+    private var rect: RectF? = null
 
     private val paint by lazy {
         Paint().apply {
@@ -34,8 +34,8 @@ class BarcodeRectOverlay : View, BarcodeOverlay {
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        if (::rect.isInitialized) {
-            canvas?.drawRect(rect, paint)
+        rect?.let {
+            canvas?.drawRect(it, paint)
         }
     }
 }

@@ -43,6 +43,8 @@ class Camera2Source(config: ScannerConfig, displaySize: Size) : CameraSource(con
     }
 
     override fun clear() {
+        super.clear()
+
         CameraX.unbindAll()
     }
 }
